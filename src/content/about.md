@@ -7,7 +7,7 @@ I'm Chien Hua (Brian) Shu, an M.S. student in Computer Science at Purdue Univers
 
 ## What I work on
 
-Robot learning for long-horizon manipulation: tasks where a robot has to get many steps right in a row, not just one grasp. In practice that means imitation learning, post-training vision-language-action (VLA) models, and the benchmarks and evaluation that tell you whether a policy actually works. I tend to build the parts that come before training: the simulated task, the success check, the expert that produces demonstrations, and the pipeline that turns them into a dataset.
+That means tasks where a robot has to get many steps right in a row, not just one grasp. In practice that means imitation learning, post-training vision-language-action (VLA) models, and the benchmarks and evaluation that tell you whether a policy actually works. I tend to build the parts that come before training: the simulated task, the success check, the expert that produces demonstrations, and the pipeline that turns them into a dataset.
 
 Right now that is a [dishwasher-loading policy](/projects/dishwasher/) in NVIDIA Isaac Lab. Before Purdue I built the subtask environments and asset pipeline for [Fiatlux](/projects/fiatlux/), a benchmark in which a Unitree G1 humanoid climbs a ladder to replace a light bulb; the paper is under review at ICRA 2027. For the AI for Industry Challenge I wrote a force-monitored expert for [cable insertion](/projects/cable-insertion/) on a UR5 and trained ACT and Diffusion Policy on its demonstrations.
 

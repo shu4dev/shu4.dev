@@ -6,5 +6,7 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://shu4.dev',
   output: 'static',
+  // the About page moved to the home page (2026-10-25)
+  redirects: { '/about': '/' },
   integrations: [sitemap()],
 });
