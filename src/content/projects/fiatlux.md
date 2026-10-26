@@ -2,9 +2,9 @@
 title: Fiatlux
 summary: A long-horizon benchmark in which a simulated Unitree G1 humanoid climbs a ladder and replaces a light bulb, built in NVIDIA Isaac Lab.
 year: 2026
-tags: [Isaac Lab, Unitree G1, Benchmark, USD assets]
+tags: [Isaac Lab, Unitree G1, Benchmark, Domain randomization]
 order: 1
-status: Under review at ICRA 2027
+status: Under review at IEEE ICRA 2027
 hero:
   kind: video
   src: /media/fiatlux/fiatlux-loop.mp4
@@ -23,9 +23,9 @@ links:
 
 ## What it is
 
-Changing a ceiling light is a small job for a person and a long one for a humanoid. Fiatlux turns it into a single task for a simulated Unitree G1 in NVIDIA Isaac Lab: move the ladder under the fixture, climb it, remove the old bulb, carry it down to the disposal crate, pick up a new bulb from the table, climb again holding it, screw it in and climb down. The fixture hangs above standing reach, so the robot cannot skip the ladder.
+Fiatlux is an NVIDIA Isaac Lab benchmark in which a Unitree G1 humanoid climbs a ladder to replace a bulb. In one episode the robot moves the ladder under the fixture, climbs it, removes the old bulb, descends with it, carries it to the disposal crate and drops it in, then approaches and grabs a new bulb, carries it to the ladder, climbs with it, screws it in and climbs down. The fixture sits above the robot's standing reach, so the episode cannot be completed without climbing.
 
-The task is split into 12 subtasks, each with its own environment, start state and success gate. A policy can be trained and scored on one subtask at a time, or run through the whole chain.
+The task is split into 12 subtask environments. Each is a registered environment whose start pose approximates the state its predecessor ends in, and each is scored on its own success gate.
 
 <figure>
   <img src="/media/fiatlux/S01.jpg" alt="The G1 crouching beside an A-frame ladder and gripping it to move it under the ceiling fixture." width="900" height="566" loading="lazy" decoding="async" />
@@ -36,8 +36,10 @@ The paper is under review at IEEE ICRA 2027. The four first authors, me among th
 
 ## What I built
 
-- **The 12 subtask environments.** Flat navigation, manipulation and climbing, each registered as its own Isaac Lab environment. Start states are chained, so a subtask begins in the state the previous one leaves behind. Every episode has a 120 s horizon, and success is a quantitative gate, not a judgement call. The bulb shows how strict that gets: the hand may press on the 35 g bulb with at most 50 N, or the attempt fails.
-- **The scene hierarchy and asset pipeline.** One scene tree shared by all 12 subtasks, with a preset layout per task and domain randomization over layout, friction, lighting and materials. Objects come from an image-to-mesh pipeline that writes USD assets, and a structural verifier checks each asset before it goes into a scene.
+I co-developed the benchmark as a student researcher at the Hawaiʻi AI Initiative (HawAII), University of Hawaiʻi at Mānoa, advised by Prof. Igor Molybog.
+
+- **The 12 subtask environments.** I split the task into 12 subtask environments with difficulty-weighted scoring and domain randomization over the scene layout, grip friction, lighting, material colours and the robot's start state. The 35 g bulb is fragile: an episode counts as broken if the peak contact force over both hands exceeds 50 N.
+- **Baselines.** I released RSL-RL PPO and zero-shot GR00T N1.7 VLA baselines. None completes a single subtask.
 
 <figure>
   <img src="/media/fiatlux/S08.jpg" alt="The G1 standing behind a workbench and reaching for the fresh bulb with one hand; storage crates sit under the table." width="900" height="566" loading="lazy" decoding="async" />
@@ -46,4 +48,4 @@ The paper is under review at IEEE ICRA 2027. The four first authors, me among th
 
 ## Result
 
-The benchmark ships 12 subtasks with one environment each, a G1 with 53 actuated degrees of freedom, a 50 N fragility bound on the bulb and 107 teleoperated takes. The paper, the project page with video, and the code are linked below.
+The benchmark ships 12 subtask environments, a G1 with 53 actuated degrees of freedom, a 50 N fragility bound on the bulb and 107 teleoperated takes. The released baselines complete no subtask. The paper, the project page with video, and the code are linked below.

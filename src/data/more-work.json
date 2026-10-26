@@ -2,46 +2,46 @@
   {
     "title": "Jane Street Real-Time Market Data Forecasting",
     "meta": "Kaggle",
-    "line": "Supervised autoencoder + MLP; ranked 440 of 3,000 (top 15%)."
+    "line": "Modeled market behavior with a supervised autoencoder combined with an MLP; ranked 440th of 3,000 participants (top 15%)."
   },
   {
     "title": "Spinner Dolphin Photo Grading Protocol",
     "meta": "Computer vision",
-    "line": "Multi-stage model that detects, rates and classifies spinner dolphins by fin distinctiveness."
+    "line": "Developed a multi-stage model that detects, rates and classifies dolphins by fin distinctiveness, and automated image-data pipelines."
   },
   {
     "title": "BirdCLEF 2024",
     "meta": "Audio classification",
-    "line": "Transfer-learned MobileNet-v2 on spectrograms to identify under-studied Indian bird species."
+    "line": "Identified under-studied Indian bird species from call spectrograms using a TensorFlow MobileNetV2 CNN with transfer learning."
   },
   {
-    "title": "Higgs Boson Detection",
+    "title": "Higgs Boson Detection 2024",
     "meta": "Classification",
-    "line": "Compared scikit-learn classifiers; 11th of 52 on the public leaderboard."
+    "line": "Benchmarked multiple scikit-learn models; ranked 11th of 52 on the public leaderboard and 12th of 52 on the private leaderboard."
   },
   {
     "title": "OpenAI CarRacing",
     "meta": "TensorFlow",
-    "line": "2D CNN driving agent in TensorFlow for randomly generated tracks."
+    "line": "Developed an AI agent that drives on randomly generated race tracks, with a 2D convolutional neural network built in TensorFlow."
   },
   {
-    "title": "Full Cycle TakeOut",
+    "title": "Full Cycle TakeOut Web App",
     "meta": "HACC 2023 finalist",
-    "line": "MERN and Meteor web app for ZeroWaste Oʻahu."
+    "line": "Created with support from the nonprofit ZeroWaste Oahu and the Full Cycle TakeOut program, in two technology stacks: MERN and Meteor."
   },
   {
-    "title": "Protein folding",
+    "title": "Protein Folding Algorithm",
     "meta": "Algorithms",
-    "line": "Hydrophobic-polar lattice model solved by recursive backtracking."
+    "line": "Simulated the hydrophobic-polar (HP) protein folding model with recursive backtracking to find the optimal fold, under sponsorship from Decision Research Corporation."
   },
   {
-    "title": "PANDA programming club",
-    "meta": "Lecturer & Curriculum Developer · 2022–2025",
-    "line": "Designed an algorithms curriculum and led small-group sessions; 2023 Best Officer award."
+    "title": "Programming and Algorithms Club (PANDA)",
+    "meta": "Lecturer and Curriculum Developer · Aug 2022 – Aug 2025",
+    "line": "Earned the 2023 Best Officer (Big Panda) Award; designed a curriculum tailored to students' programming levels and led small-group lectures on developing and optimizing algorithms."
   },
   {
-    "title": "ACM at Mānoa",
-    "meta": "Server Administrator & Webmaster · 2023–2024",
-    "line": "Maintained the chapter website and built internal tools for the leadership team."
+    "title": "Association for Computing Machinery (ACM) at Mānoa",
+    "meta": "Server Administrator and Webmaster · Oct 2023 – Oct 2024",
+    "line": "Maintained and improved the chapter's software and official website using React and Ruby/Jekyll, and built custom applications for chapter leadership on request."
   }
 ]

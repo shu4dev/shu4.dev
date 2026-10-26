@@ -1,8 +1,8 @@
 ---
 title: Dishwasher loading
-summary: A general dishwasher-loading manipulation policy in NVIDIA Isaac Lab, built on simulated dish assets I released publicly.
+summary: A general-purpose robot manipulation policy for dishwasher tasks in NVIDIA Isaac Lab, with simulation assets I released publicly.
 year: 2026
-tags: [Isaac Lab, Manipulation, Planning, Imitation learning]
+tags: [Isaac Lab, Manipulation, Robot learning]
 order: 2
 status: In progress
 hero:
@@ -18,16 +18,14 @@ links:
 
 ## What it is
 
-Loading a dishwasher looks routine, but for a robot it is a long chain of decisions: which dish to pick next, which rack and slot it belongs in, how to grasp it, and how to set it down without blocking the dishes that still have to go in. I am building a general dishwasher-loading manipulation policy in NVIDIA Isaac Lab. This is my graduate research in the Cognitive Robot Autonomy & Learning (CoRAL) Lab at Purdue, advised by Prof. Ahmed H. Qureshi.
+I am developing a general-purpose robot manipulation policy for dishwasher tasks, simulated in NVIDIA Isaac Lab. This is my graduate research in the Cognitive Robot Autonomy and Learning (CoRAL) Lab at Purdue University, advised by Prof. Ahmed H. Qureshi.
 
-The project is ongoing. This page covers only what is already public: the dish asset dataset on Hugging Face and the simulation repository with its figures.
+The project is ongoing. This page covers only what is already public: the asset dataset on Hugging Face and the simulation repository with its figures.
 
 ## What I built
 
-- **Simulated dish assets.** I released the dishes as a public Hugging Face dataset, so the objects can be used outside the lab.
-- **A load-quality score.** A scoring function rates how well a rack is loaded, and it serves as the task reward.
-- **A dish-placement dependency graph.** It captures how placements depend on one another, and the loading planner uses it as a heuristic.
-- **Planner and motion generation, in progress.** I am now developing the loading planner and the robot's motion generation.
+- **Simulation assets.** I released the dishwasher and dish assets, with their USD files, meshes and parameters, as a public Hugging Face dataset.
+- **Simulation code.** The Isaac Lab simulation code is public on GitHub; the figures below come from its documentation.
 
 <figure class="paper">
   <img src="/media/dishwasher/rack_geometry.webp" alt="Three views of the lower dishwasher rack with its cutlery basket, iso, top and side, with the rack's parts colour-coded by role: plate tines, bowl tines, floor wires, guard, handle and wheels." width="1400" height="478" loading="lazy" decoding="async" />
@@ -39,11 +37,6 @@ The project is ongoing. This page covers only what is already public: the dish a
   <figcaption>One entry in the object library: a mug, with its dimensions and mass.</figcaption>
 </figure>
 
-<figure class="paper">
-  <img src="/media/dishwasher/slot_detection.webp" alt="Top-down plot in the robot-base frame: the robot base at the origin, a dashed circle for the arm's 0.85 m reach, and the lower rack's wires with three numbered slots marked inside the reach." width="818" height="810" loading="lazy" decoding="async" />
-  <figcaption>Slots derived on the lower rack, plotted in the robot-base frame against the arm's 0.85 m reach.</figcaption>
-</figure>
-
 ## Result
 
-There are no results to report yet, because the work is still in progress. The public pieces are the dish asset dataset and the simulation code, both linked below; the figures above come from that repository's documentation: the rack model, one object-library entry, and the rack slots within the arm's reach. Next, demonstrations from the planner will seed an imitation-learning policy.
+There are no results to report yet, because the work is still in progress. The public pieces are the asset dataset and the simulation code, both linked below.

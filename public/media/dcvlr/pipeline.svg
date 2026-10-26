@@ -1,7 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); letter-spacing: 0.04em">
-  <!-- Original diagram: the DCVLR data pipeline, from source images to a fine-tuned model. Generate runs down the
-       left column (01-04), curate and train run up the right (05-07) to the fine-tuned model. Stroke-only lines in
-       currentColor, unfilled boxes; the page draws it on a solid box so no meteor crosses a label.
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 216" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); letter-spacing: 0.04em">
+  <!-- Original diagram: the DCVLR data pipeline, from source images to the DCVLR_10K dataset. Generation runs down the
+       left column (01-03), across to the answer, and up the right column (04-06) through the filter to the dataset.
+       Stroke-only lines in currentColor, unfilled boxes; the page draws it on a solid box so no meteor crosses a label.
        Text: 16 units for stage names, 14.5 units at 0.78 opacity. -->
 
   <!-- boxes -->
@@ -9,8 +9,6 @@
     <rect x="16" y="22" width="128" height="44" rx="4" vector-effect="non-scaling-stroke"/>
     <rect x="16" y="88" width="128" height="44" rx="4" vector-effect="non-scaling-stroke"/>
     <rect x="16" y="154" width="128" height="44" rx="4" vector-effect="non-scaling-stroke"/>
-    <rect x="16" y="220" width="128" height="44" rx="4" vector-effect="non-scaling-stroke"/>
-    <rect x="252" y="220" width="136" height="44" rx="4" vector-effect="non-scaling-stroke"/>
     <rect x="252" y="154" width="136" height="44" rx="4" vector-effect="non-scaling-stroke"/>
     <rect x="252" y="88" width="136" height="44" rx="4" vector-effect="non-scaling-stroke"/>
     <rect x="252" y="22" width="136" height="44" rx="4" vector-effect="non-scaling-stroke"/>
@@ -22,10 +20,8 @@
   <!-- generate: down the left column -->
   <path d="M80 66V86M76 80L80 86L84 80" vector-effect="non-scaling-stroke"/>
   <path d="M80 132V152M76 146L80 152L84 146" vector-effect="non-scaling-stroke"/>
-  <path d="M80 198V218M76 212L80 218L84 212" vector-effect="non-scaling-stroke"/>
-  <!-- across to the filter, then up the right column -->
-  <path d="M144 242H250M244 238L250 242L244 246" vector-effect="non-scaling-stroke"/>
-  <path d="M320 220V200M316 206L320 200L324 206" vector-effect="non-scaling-stroke"/>
+  <!-- across to the answer, then up the right column -->
+  <path d="M144 176H250M244 172L250 176L244 180" vector-effect="non-scaling-stroke"/>
   <path d="M320 154V134M316 140L320 134L324 140" vector-effect="non-scaling-stroke"/>
   <path d="M320 88V68M316 74L320 68L324 74" vector-effect="non-scaling-stroke"/>
 
@@ -37,15 +33,13 @@
     <text x="80" y="125">synthesis</text>
     <text x="80" y="174">reasoning</text>
     <text x="80" y="191">steps</text>
-    <text x="80" y="248">answer</text>
-    <text x="320" y="240">filter</text>
-    <text x="320" y="174">DCVLR_10K</text>
-    <text x="320" y="116">fine-tune</text>
-    <text x="320" y="50">Qwen2.5-VL</text>
+    <text x="320" y="182">answer</text>
+    <text x="320" y="108">filter</text>
+    <text x="320" y="41">DCVLR_10K</text>
   </g>
   <g stroke="none" fill="currentColor" font-size="14.5" fill-opacity="0.78" text-anchor="middle">
-    <text x="320" y="257">drop rejects</text>
-    <text x="320" y="191">10k samples</text>
+    <text x="320" y="125">drop rejects</text>
+    <text x="320" y="57.5">10k samples</text>
   </g>
 
   <!-- stage numbers -->
@@ -53,9 +47,8 @@
     <text x="16" y="18">01</text>
     <text x="16" y="84">02</text>
     <text x="16" y="150">03</text>
-    <text x="16" y="216">04</text>
-    <text x="252" y="216">05</text>
-    <text x="252" y="150">06</text>
-    <text x="252" y="84">07</text>
+    <text x="252" y="150">04</text>
+    <text x="252" y="84">05</text>
+    <text x="252" y="18">06</text>
   </g>
 </svg>

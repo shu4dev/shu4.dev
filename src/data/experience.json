@@ -1,37 +1,37 @@
 [
   {
-    "org": "CoRAL Lab, Purdue",
+    "org": "CoRAL Lab, Purdue University",
     "role": "Graduate Researcher",
-    "place": "West Lafayette",
-    "dates": "Aug 2026 – present",
-    "line": "Building a general dishwasher-loading manipulation policy in NVIDIA Isaac Lab; released the simulated dish assets."
+    "place": "West Lafayette, IN",
+    "dates": "Aug 2026 – Present",
+    "line": "Developing a general-purpose robot manipulation policy for dishwasher tasks. Advisor: Prof. Ahmed H. Qureshi."
   },
   {
-    "org": "HawAII, UH Mānoa",
-    "role": "Research Assistant",
-    "place": "Honolulu",
-    "dates": "Mar – Sep 2026",
-    "line": "Built the 12 subtask environments and asset pipeline for the Fiatlux benchmark, and the force-monitored expert and imitation-learning pipeline for the AI for Industry Challenge."
+    "org": "HawAII, University of Hawaiʻi at Mānoa",
+    "role": "Student Researcher",
+    "place": "Honolulu, HI",
+    "dates": "Mar 2026 – Sep 2026",
+    "line": "Co-developed Fiatlux, an Isaac Lab benchmark in which a Unitree G1 humanoid climbs a ladder to replace a bulb. For the AI for Industry Challenge, upgraded a privileged expert for UR5e cable insertion and trained ACT and Diffusion Policy policies from expert demos. Advisor: Prof. Igor Molybog."
   },
   {
     "org": "Hyundai Card",
     "role": "Data Science Intern",
-    "place": "Seoul",
-    "dates": "Jun – Jul 2025",
-    "line": "RAG pipeline for text-to-SQL with self-consistency decoding; migrated to an open-source model while keeping 80% execution accuracy."
+    "place": "Seoul, South Korea",
+    "dates": "Jun 2025 – Jul 2025",
+    "line": "Built a retrieval-augmented generation (RAG) pipeline from scratch for text-to-SQL tasks with self-consistency decoding; cut inference costs by moving from a closed- to an open-source model while preserving 80% accuracy."
   },
   {
-    "org": "UH Mānoa",
+    "org": "University of Hawaiʻi at Mānoa",
     "role": "Software Verification Developer",
-    "place": "Honolulu",
+    "place": "Honolulu, HI",
     "dates": "May 2024 – May 2025",
-    "line": "Isabelle/HOL proofs of functional correctness, following the seL4 and RT-11 verification efforts."
+    "line": "Applied formal methods to verify functional correctness in a project inspired by seL4 and RT-11, with a proof strategy in interactive theorem proving (Isabelle/HOL)."
   },
   {
-    "org": "UH Mānoa",
+    "org": "University of Hawaiʻi at Mānoa",
     "role": "Research Assistant",
-    "place": "Honolulu",
-    "dates": "Jun – Aug 2023",
-    "line": "Efficient simulation of a biological reaction model, with 2D and 3D visualization of the results."
+    "place": "Honolulu, HI",
+    "dates": "Jun 2023 – Aug 2023",
+    "line": "Devised an efficient algorithm to simulate a mathematical model of biological reactions, and created 2D and 3D models to visualize its results."
   }
 ]

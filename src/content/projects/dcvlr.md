@@ -1,13 +1,13 @@
 ---
 title: DCVLR
-summary: Data Curation for Visual-Language Reasoning, a pipeline that generates synthetic multimodal question-answer pairs with reasoning steps and uses them to fine-tune Qwen2.5-VL.
+summary: Data Curation for Visual Language Reasoning, a scalable pipeline that turns images into question–answer pairs with intermediate reasoning, and the public DCVLR_10K dataset.
 year: 2025
-tags: [VLM, Synthetic data, Qwen2.5-VL, Fine-tuning]
+tags: [VLM, Synthetic data, Data pipeline, Hugging Face dataset]
 order: 4
 hero:
   kind: svg
   src: /media/dcvlr/pipeline.svg
-  alt: "Pipeline diagram in seven stages. Source images, question synthesis, reasoning steps and answer run down one column; filter (which drops rejected samples), the DCVLR_10K dataset of 10k samples and fine-tuning run up the other, ending in a fine-tuned Qwen2.5-VL."
+  alt: "Pipeline diagram in six stages. Source images, question synthesis and reasoning steps run down one column; answer, filter (which drops rejected samples) and the DCVLR_10K dataset of 10k samples run up the other, ending at the dataset."
 links:
   - label: Code (shu4dev/DCVLR)
     href: https://github.com/shu4dev/DCVLR
@@ -17,23 +17,14 @@ links:
 
 ## What it is
 
-DCVLR, short for Data Curation for Visual-Language Reasoning, is about the training data rather than the model. A vision-language model can often produce the right answer about an image without working through the image at all. Training examples that spell out the intermediate steps give it something better to imitate.
-
-So I built a pipeline that writes its own training set: synthetic question-answer pairs about images, each carrying the reasoning steps that lead from the image to the answer.
+DCVLR, short for Data Curation for Visual Language Reasoning, is about the training data rather than the model. The research question is whether synthetic reasoning-step data improves visual question answering (VQA) performance.
 
 ## What I built
 
-The pipeline runs in the stages shown in the diagram:
+- **The research question.** I formulated the question of whether synthetic reasoning-step data improves VQA performance, and partnered with teammates to iterate on the research design and critique results.
+- **The data pipeline.** I built a scalable data pipeline that turns images into question–answer pairs with intermediate reasoning, in the stages shown in the diagram.
 
-1. Start from a pool of source images.
-2. Synthesize a question about each image.
-3. Generate the intermediate reasoning steps.
-4. Generate the final answer.
-5. Filter the generated samples.
-6. Collect what passes into a dataset.
-7. Fine-tune a model on that dataset.
-
-Running it end to end produced DCVLR_10K, a dataset of 10,000 samples, and I fine-tuned Qwen2.5-VL on it.
+Running the pipeline produced DCVLR_10K, a dataset of 10,000 samples.
 
 ### What a sample looks like
 
@@ -47,8 +38,8 @@ answer     5</code></pre>
 <figcaption>Illustrative example of the format, written for this page. It is not a row from DCVLR_10K.</figcaption>
 </figure>
 
-Each real sample has the same parts: an image, a question about it, the steps in between, and the answer.
+Each real sample pairs an image and a question with a solution that carries the intermediate reasoning and the answer.
 
 ## Result
 
-DCVLR_10K, 10,000 synthetic samples with reasoning steps, is public on Hugging Face, and the pipeline code is on GitHub. Qwen2.5-VL was fine-tuned on the dataset. Both links are below.
+DCVLR_10K, 10,000 synthetic samples with reasoning steps, is public on Hugging Face, and the pipeline code is on GitHub. Both links are below.
