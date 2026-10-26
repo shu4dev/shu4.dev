@@ -1,8 +1,8 @@
 ---
 /**
- * Document shell: head (meta, OG, canonical, fonts, theme boot), skip link, ClientRouter,
- * the fixed rain canvas, and the column with header, <main id="main"> and footer.
- * Pass a `panel` slot (Split.astro does) to get the two-column split stage; without it the page is one column.
+ * Document shell: head (meta, OG, canonical, fonts, theme boot), skip link, ClientRouter, the fixed rain canvas
+ * behind .page, a sticky header (name, section anchors, CV, then .site-tools: rain control and theme toggle),
+ * <main id="main"> and the footer. Header, main and footer content sit in a 1120px column (.wrap).
  */
 import '@fontsource-variable/inter';
 import '@fontsource-variable/jetbrains-mono';
@@ -37,14 +37,16 @@ const site = Astro.site ?? new URL('https://shu4.dev');
 const canonical = new URL(Astro.url.pathname, site).href;
 const ogImage = new URL(image, site).href;
 const path = Astro.url.pathname;
-const hasPanel = Astro.slots.has('panel');
 const year = new Date().getFullYear();
 
-// "/" is the About page, so the site name is its link; Projects marks the project pages.
+// "/" is the home page; section anchors point at it from every page
 const isHome = path === '/' || path === '/index.html';
 const nav = [
-  { href: '/#projects', label: 'Projects', current: path.startsWith('/projects/') },
-  { href: '/cv.pdf', label: 'CV', current: false, reload: true },
+  { href: '/#projects', label: 'Projects' },
+  { href: '/#publications', label: 'Publications' },
+  { href: '/#experience', label: 'Experience' },
+  { href: '/#contact', label: 'Contact' },
+  { href: '/cv.pdf', label: 'CV', reload: true },
 ];
 ---
 
@@ -138,23 +140,16 @@ const nav = [
     <canvas id="rain" aria-hidden="true" transition:persist="rain-canvas"></canvas>
     <Rain />
 
-    <div class="page" data-layout={hasPanel ? 'split' : 'plain'}>
-      <slot name="panel" />
-
-      <div class="column">
-        <header class="site-header">
+    <div class="page">
+      <header class="site-header">
+        <div class="wrap header-row">
           <a class="site-name" href="/" aria-current={isHome ? 'page' : undefined}>Brian Shu</a>
           <nav class="site-nav" aria-label="Primary">
             <ul role="list">
               {
                 nav.map((item) => (
                   <li>
-                    <a
-                      class="mono"
-                      href={item.href}
-                      aria-current={item.current ? 'page' : undefined}
-                      data-astro-reload={item.reload ? true : undefined}
-                    >
+                    <a class="mono" href={item.href} data-astro-reload={item.reload ? true : undefined}>
                       {item.label}
                     </a>
                   </li>
@@ -163,20 +158,22 @@ const nav = [
             </ul>
           </nav>
           <div class="site-tools">
-            <Contact variant="icons" />
+            <Rain variant="control" />
             <ThemeToggle />
           </div>
-        </header>
+        </div>
+      </header>
 
-        <main id="main" tabindex="-1">
-          <slot />
-        </main>
+      <main id="main" class="wrap" tabindex="-1">
+        <slot />
+      </main>
 
-        <footer class="site-footer">
+      <footer class="site-footer">
+        <div class="wrap footer-row">
           <Contact variant="icons" />
           <p class="mono muted">© {year} Brian Shu</p>
-        </footer>
-      </div>
+        </div>
+      </footer>
     </div>
   </body>
 </html>
@@ -202,28 +199,16 @@ const nav = [
   .page {
     position: relative;
     z-index: 1;
-    min-height: 100svh;
-  }
-
-  @media (min-width: 960px) {
-    .page[data-layout='split'] {
-      display: grid;
-      grid-template-columns: var(--panel-fr) var(--column-fr);
-      align-items: start;
-    }
-  }
-
-  .column {
     display: flex;
     flex-direction: column;
-    min-width: 0;
     min-height: 100svh;
-    padding-inline: var(--gutter);
   }
 
-  .page[data-layout='plain'] .column {
-    max-width: 64rem;
+  .wrap {
+    width: 100%;
+    max-width: calc(var(--content) + 2 * var(--gutter));
     margin-inline: auto;
+    padding-inline: var(--gutter);
   }
 
   main {
@@ -235,17 +220,28 @@ const nav = [
     outline: none;
   }
 
+  /* sticky, on a translucent ground so content and meteors pass under it */
   .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    border-bottom: 1px solid var(--hairline);
+    background: color-mix(in srgb, var(--ground) 86%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  /* phones: name and tools on one row, the nav below it (12px labels fit one row at 390px, wrap below that) */
+  .header-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    column-gap: var(--space-5);
-    row-gap: var(--space-2);
-    padding-block: var(--space-5);
-    border-bottom: 1px solid var(--hairline);
+    column-gap: var(--space-6);
+    padding-block: var(--space-2);
   }
 
   .site-name {
+    padding-block: var(--space-1);
     color: var(--ink);
     font-weight: 600;
     font-size: 1.0625rem;
@@ -259,7 +255,8 @@ const nav = [
 
   .site-nav ul {
     display: flex;
-    gap: var(--space-5);
+    flex-wrap: wrap;
+    column-gap: var(--space-3);
     margin: 0;
     padding: 0;
     list-style: none;
@@ -267,12 +264,11 @@ const nav = [
 
   .site-nav a {
     display: inline-block;
-    padding-block: var(--space-1);
+    padding-block: var(--space-2);
     color: var(--muted);
-  }
-
-  .site-nav a[aria-current='page'] {
-    color: var(--accent);
+    font-size: var(--fs-mono-sm);
+    letter-spacing: 0.02em;
+    white-space: nowrap;
   }
 
   @media (hover: hover) {
@@ -284,24 +280,41 @@ const nav = [
   .site-tools {
     display: flex;
     align-items: center;
-    gap: var(--space-1);
+    gap: var(--space-2);
     margin-left: auto;
   }
 
-  @media (min-width: 40rem) {
+  @media (min-width: 760px) {
+    .header-row {
+      flex-wrap: nowrap;
+      padding-block: var(--space-3);
+    }
+
     .site-nav {
       order: 0;
       flex-basis: auto;
     }
+
+    .site-nav ul {
+      column-gap: var(--space-5);
+    }
+
+    .site-nav a {
+      font-size: var(--fs-mono);
+      letter-spacing: var(--tracking-mono);
+    }
   }
 
   .site-footer {
+    border-top: 1px solid var(--hairline);
+  }
+
+  .footer-row {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-3);
     padding-block: var(--space-5) var(--space-6);
-    border-top: 1px solid var(--hairline);
   }
 </style>

@@ -1,17 +1,20 @@
 /**
- * Star rain on the fixed canvas#rain (night theme only).
+ * Meteor shower on the fixed, full-viewport canvas#rain (night theme only).
  *
- * Two fields share one canvas:
- *  - panel field: full density, in the coordinates of the current page's #panel (so on phones it scrolls with it),
- *    clipped to the whole #panel rect, not the media: at night the media sits inset inside the panel, so the rain
- *    fills the margin around it and shows faintly through the media (--media-opacity).
- *  - page field: PAGE_DENSITY of that, in viewport coordinates, clipped to everything outside the panel.
- * Streaks fall from top-left to bottom-right; a bright head with a fading tail, 1-2 px wide.
- * Intensity 0-100 (slider #rain-slider, localStorage "rain", default 50) scales count (x2 at 100) and speed together.
- * Palette: white, or the nine-colour mix after the "rain:palette" event (flips; sessionStorage "rain-palette").
+ * Each meteor starts at a point A on the top or left edge (picked in proportion to the flux through each edge, so
+ * the sky fills evenly), heads lower-right at 25-40 degrees below the horizontal and ends at B, where its head
+ * leaves the viewport. A crossing takes 8-14 s. The tail is 15-30 % of the viewport diagonal, tapered, fading from
+ * a bright head (2 px core, soft glow) to transparent; it grows out from A, so a meteor lit mid-sky starts short.
+ * A meteor fades in over its first FADE_IN s (its head glow a little larger in the first second) and fades out over
+ * the last 15 % of its path.
+ * Intensity 0-100 (slider #rain-slider, localStorage "rain", default 50) sets how many fly at once, not their speed:
+ * 0 none (loop stopped, canvas cleared), 10 two or three, 50 a steady shower, 100 a sky covered in streaks.
+ * Streaks behind the content column (<main>'s horizontal extent) draw at COLUMN_ALPHA so text stays readable.
+ * Palette: white, or the nine colours after window "rain:palette" { palette: 'nine' } (sessionStorage
+ * "rain-palette" is read on load; ThemeToggle owns it). Colours go by spawn index, so the mix is exactly even.
  */
 
-export const NINE_COLOURS = [
+const NINE_COLOURS = [
   '#87CEEB', // sky blue
   '#9ACD32', // yellow-green
   '#FFB7C5', // pink
@@ -22,115 +25,43 @@ export const NINE_COLOURS = [
   '#E53935', // red
   '#1E6FD9', // blue
 ];
-const WHITE = ['#FFFFFF'];
 
-export const PALETTE_EVENT = 'rain:palette';
+const PALETTE_EVENT = 'rain:palette';
 const RAIN_KEY = 'rain';
 const PALETTE_KEY = 'rain-palette';
 const DEFAULT_INTENSITY = 50;
 
-const ANGLE = (60 * Math.PI) / 180; // below the horizontal
-const DX = Math.cos(ANGLE);
-const DY = Math.sin(ANGLE);
+const MAX_METEORS = 80; // concurrent cap; at 100 a 1440x900 viewport asks for about 54
+const PER_DIAGONAL = 0.032; // meteors at intensity 100 per CSS px of viewport diagonal; 100 now equals the former 50 (Brian: the old default was too much)
+const COLUMN_ALPHA = 0.55;
+const COLUMN_RAMP = 48; // CSS px soft edge outside the column
+const FADE_IN = 0.6; // s
+const FADE_OUT = 0.15; // fraction of the path
+const DYING = 0.4; // s: excess meteors fade out this fast when the slider drops
 
-const AREA_PER_STAR = 4200; // CSS px² per streak inside the panel at intensity 50
-const PAGE_DENSITY = 0.15; // page background density relative to the panel
-const PAGE_ALPHA = 0.6; // page streaks are dimmer so text over them stays easy to read
-const SPRITE_LEN = 40; // CSS px, the longest streak; each star draws it at scale k (0.45..1)
-const SPRITE_WIDTH = 2; // CSS px line width at k = 1, so streaks are 0.9-2 px wide
-const SPRITE_PAD = 4;
+// Sprites hold SCALE device px per CSS px (enough for DPR 2 at the thickest meteor), so they never rebuild.
+const SCALE = 4;
+const TAIL_SPRITE_LEN = 512; // device px, stretched to the tail length
+const TAIL_THICK = 4; // CSS px sprite height: 2 px core + soft halo
+const HEAD_R = 5; // CSS px glow radius
 
 type Palette = 'white' | 'nine';
 
-interface Star {
-  x: number; // head position, field coordinates
+interface Meteor {
+  x: number; // A, CSS px, viewport coordinates
   y: number;
-  k: number; // size 0.45..1 (length, width, speed and brightness follow it)
-  v: number; // base speed, CSS px/s
-  a: number; // alpha
-}
-
-function makeStar(w: number, h: number, inside: boolean): Star {
-  const k = 0.45 + 0.55 * Math.random() ** 1.7;
-  const star: Star = { x: 0, y: 0, k, v: 240 + 420 * k, a: Math.min(1, 0.28 + 0.62 * k + 0.1 * Math.random()) };
-  if (inside) {
-    star.x = Math.random() * w;
-    star.y = Math.random() * h;
-  } else {
-    enter(star, w, h);
-  }
-  return star;
-}
-
-/** Put a star just outside the top or left edge, weighted by the flux through each edge so density stays even. */
-function enter(star: Star, w: number, h: number) {
-  const top = w * DY;
-  const left = h * DX;
-  if (Math.random() * (top + left) < top) {
-    star.x = Math.random() * w;
-    star.y = -1;
-  } else {
-    star.x = -1;
-    star.y = Math.random() * h;
-  }
-}
-
-class Field {
-  w = 0;
-  h = 0;
-  stars: Star[] = [];
-
-  constructor(
-    readonly density: number,
-    readonly alpha = 1,
-  ) {}
-
-  resize(w: number, h: number) {
-    if (w === this.w && h === this.h) return;
-    if (this.w > 0 && this.h > 0) {
-      const sx = w / this.w;
-      const sy = h / this.h;
-      for (const s of this.stars) {
-        s.x *= sx;
-        s.y *= sy;
-      }
-    }
-    this.w = w;
-    this.h = h;
-  }
-
-  sync(intensity: number) {
-    const n = Math.round(((this.w * this.h) / AREA_PER_STAR) * this.density * (intensity / 50));
-    while (this.stars.length < n) this.stars.push(makeStar(this.w, this.h, true));
-    if (this.stars.length > n) this.stars.length = n;
-  }
-
-  step(dt: number, speed: number, len: number) {
-    for (const s of this.stars) {
-      const d = s.v * speed * dt;
-      s.x += DX * d;
-      s.y += DY * d;
-      const tail = SPRITE_LEN * s.k * len;
-      if (s.x - tail * DX > this.w || s.y - tail * DY > this.h) enter(s, this.w, this.h);
-    }
-  }
-
-  draw(ctx: CanvasRenderingContext2D, ox: number, oy: number, sprites: HTMLCanvasElement[], len: number) {
-    const n = sprites.length;
-    // head position inside the sprite, in CSS px at scale 1
-    const hx = SPRITE_PAD + SPRITE_LEN * DX;
-    const hy = SPRITE_PAD + SPRITE_LEN * DY;
-    const sw = SPRITE_LEN * DX + SPRITE_PAD * 2;
-    const sh = SPRITE_LEN * DY + SPRITE_PAD * 2;
-    for (let i = 0; i < this.stars.length; i++) {
-      const s = this.stars[i];
-      const k = s.k * len;
-      ctx.globalAlpha = s.a * this.alpha;
-      // index-based colour: an exactly even mix, stable for each star
-      ctx.drawImage(sprites[i % n], ox + s.x - hx * k, oy + s.y - hy * k, sw * k, sh * k);
-    }
-    ctx.globalAlpha = 1;
-  }
+  dx: number; // unit direction
+  dy: number;
+  d: number; // distance travelled from A
+  d0: number; // d when lit (the tail grows from there)
+  path: number; // |AB|
+  v: number; // CSS px/s
+  tail: number; // full tail length, CSS px
+  w: number; // thickness scale
+  a: number; // brightness
+  ci: number; // colour index into NINE_COLOURS
+  age: number; // s since lit
+  die: number; // s left of a fast fade-out, or 0
 }
 
 function rgba(hex: string, a: number) {
@@ -138,40 +69,69 @@ function rgba(hex: string, a: number) {
   return `rgba(${(v >> 16) & 255}, ${(v >> 8) & 255}, ${v & 255}, ${a})`;
 }
 
-/** One pre-rendered streak per colour (all streaks share an angle, so drawImage replaces per-star gradients). */
-function makeSprite(colour: string, dpr: number) {
-  const w = SPRITE_LEN * DX + SPRITE_PAD * 2;
-  const h = SPRITE_LEN * DY + SPRITE_PAD * 2;
+/** Tail: a tapered wedge along +x, transparent at the left end, brightest at the right (the head). */
+function makeTail(colour: string) {
   const c = document.createElement('canvas');
-  c.width = Math.ceil(w * dpr);
-  c.height = Math.ceil(h * dpr);
+  c.width = TAIL_SPRITE_LEN;
+  c.height = TAIL_THICK * SCALE;
   const g = c.getContext('2d');
   if (!g) return c;
-  g.scale(dpr, dpr);
-  const x0 = SPRITE_PAD;
-  const y0 = SPRITE_PAD;
-  const x1 = SPRITE_PAD + SPRITE_LEN * DX;
-  const y1 = SPRITE_PAD + SPRITE_LEN * DY;
-  const tail = g.createLinearGradient(x0, y0, x1, y1);
-  tail.addColorStop(0, rgba(colour, 0));
-  tail.addColorStop(0.65, rgba(colour, 0.28));
-  tail.addColorStop(1, rgba(colour, 0.95));
-  g.strokeStyle = tail;
-  g.lineWidth = SPRITE_WIDTH;
-  g.lineCap = 'round';
-  g.beginPath();
-  g.moveTo(x0, y0);
-  g.lineTo(x1, y1);
-  g.stroke();
-  const glow = g.createRadialGradient(x1, y1, 0, x1, y1, SPRITE_WIDTH * 2);
-  glow.addColorStop(0, rgba(colour, 1));
-  glow.addColorStop(0.45, rgba(colour, 0.55));
-  glow.addColorStop(1, rgba(colour, 0));
-  g.fillStyle = glow;
-  g.beginPath();
-  g.arc(x1, y1, SPRITE_WIDTH * 2, 0, Math.PI * 2);
-  g.fill();
+  const mid = c.height / 2;
+  const wedge = (half: number, a: number) => {
+    const grad = g.createLinearGradient(0, 0, c.width, 0);
+    grad.addColorStop(0, rgba(colour, 0));
+    grad.addColorStop(0.5, rgba(colour, 0.22 * a));
+    grad.addColorStop(0.85, rgba(colour, 0.6 * a));
+    grad.addColorStop(1, rgba(colour, a));
+    g.fillStyle = grad;
+    g.beginPath();
+    g.moveTo(0, mid);
+    g.lineTo(c.width, mid - half);
+    g.lineTo(c.width, mid + half);
+    g.closePath();
+    g.fill();
+  };
+  wedge(mid, 0.22); // halo: the full sprite height at the head
+  wedge(SCALE, 0.95); // core: 2 CSS px at the head
   return c;
+}
+
+/** Head: a 2 px hot core (the colour pushed towards white) inside a soft glow of the colour. */
+function makeHead(colour: string) {
+  const size = HEAD_R * 2 * SCALE;
+  const c = document.createElement('canvas');
+  c.width = size;
+  c.height = size;
+  const g = c.getContext('2d');
+  if (!g) return c;
+  const r = size / 2;
+  const v = parseInt(colour.slice(1), 16);
+  const hot = [(v >> 16) & 255, (v >> 8) & 255, v & 255].map((ch) => Math.round(ch + (255 - ch) * 0.6)).join(', ');
+  const grad = g.createRadialGradient(r, r, 0, r, r, r);
+  grad.addColorStop(0, `rgba(${hot}, 1)`);
+  grad.addColorStop(1 / HEAD_R, `rgba(${hot}, 0.95)`); // 1 CSS px radius: the 2 px core
+  grad.addColorStop(2 / HEAD_R, rgba(colour, 0.4));
+  grad.addColorStop(1, rgba(colour, 0));
+  g.fillStyle = grad;
+  g.fillRect(0, 0, size, size);
+  return c;
+}
+
+const sprites = new Map<string, { tail: HTMLCanvasElement; head: HTMLCanvasElement }>();
+function spriteFor(colour: string) {
+  let s = sprites.get(colour);
+  if (!s) {
+    s = { tail: makeTail(colour), head: makeHead(colour) };
+    sprites.set(colour, s);
+  }
+  return s;
+}
+
+/** Concurrent meteors for an intensity: a convex ramp scaled by the diagonal, at least ceil(s/4), capped. */
+function targetCount(intensity: number, diag: number) {
+  if (intensity <= 0) return 0;
+  const full = Math.min(MAX_METEORS, Math.round(diag * PER_DIAGONAL));
+  return Math.min(MAX_METEORS, Math.max(Math.ceil(intensity / 4), Math.round(full * (intensity / 100) ** 1.8)));
 }
 
 function readIntensity(): number {
@@ -199,60 +159,69 @@ export function startRain() {
   started = true;
 
   const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-  const page = new Field(PAGE_DENSITY, PAGE_ALPHA);
-  const panelField = new Field(1);
-
   let intensity = readIntensity();
   let palette: Palette = readPalette();
-  let canvas: HTMLCanvasElement | null = null;
   let ctx: CanvasRenderingContext2D | null = null;
-  let panel: HTMLElement | null = null;
   let dpr = 1;
   let vw = 0;
   let vh = 0;
-  let sprites: HTMLCanvasElement[] = [];
-  let spriteKey = '';
+  let diag = 0;
+  let dim: CanvasGradient | null = null; // destination-out mask over the content column, or none
   let raf = 0;
   let last = 0;
-  let dirty = false; // canvas holds a frame that must be cleared when rain stops
+  let spawned = 0;
+  const live: Meteor[] = [];
+  const spare: Meteor[] = []; // finished meteors, reused
 
-  const observer = new ResizeObserver(() => measure());
-
-  function bindCanvas() {
-    const el = document.getElementById('rain');
-    if (!(el instanceof HTMLCanvasElement)) {
-      canvas = null;
-      ctx = null;
-      return;
+  /** Light a meteor at A on an edge, or (mid) somewhere along its path so a fresh sky does not arrive as a wave. */
+  function launch(m: Meteor, mid: boolean) {
+    const angle = ((25 + 15 * Math.random()) * Math.PI) / 180;
+    m.dx = Math.cos(angle);
+    m.dy = Math.sin(angle);
+    if (Math.random() * (vw * m.dy + vh * m.dx) < vw * m.dy) {
+      m.x = Math.random() * vw;
+      m.y = 0;
+    } else {
+      m.x = 0;
+      m.y = Math.random() * vh;
     }
-    if (el === canvas) return;
-    if (canvas) observer.unobserve(canvas);
-    canvas = el;
-    ctx = el.getContext('2d');
-    observer.observe(el);
-    measure();
+    m.path = Math.max(1, Math.min((vw - m.x) / m.dx, (vh - m.y) / m.dy));
+    m.d = mid ? Math.random() * m.path * (1 - FADE_OUT) : 0;
+    m.d0 = m.d;
+    m.v = diag / (8 + 6 * Math.random());
+    m.tail = diag * (0.15 + 0.15 * Math.random());
+    m.w = 0.8 + 0.45 * Math.random() ** 3; // mostly even, now and then a thicker one
+    m.a = Math.random() < 0.2 ? 0.55 + 0.3 * Math.random() : 0.9 + 0.1 * Math.random();
+    m.ci = spawned++ % NINE_COLOURS.length;
+    m.age = 0;
+    m.die = 0;
+    return m;
   }
 
   function measure() {
-    if (!canvas) return;
+    if (!ctx) return;
+    const canvas = ctx.canvas;
     dpr = Math.min(2, window.devicePixelRatio || 1);
     vw = canvas.clientWidth || window.innerWidth;
     vh = canvas.clientHeight || window.innerHeight;
+    diag = Math.hypot(vw, vh);
     const w = Math.round(vw * dpr);
     const h = Math.round(vh * dpr);
     if (canvas.width !== w || canvas.height !== h) {
       canvas.width = w; // resizing also clears the bitmap
       canvas.height = h;
     }
-    page.resize(vw, vh);
-  }
-
-  function ensureSprites() {
-    const colours = palette === 'nine' ? NINE_COLOURS : WHITE;
-    const key = `${palette}@${dpr}`;
-    if (key === spriteKey) return;
-    sprites = colours.map((c) => makeSprite(c, dpr));
-    spriteKey = key;
+    dim = null;
+    const r = document.querySelector('main')?.getBoundingClientRect();
+    if (r && r.width > 0) {
+      const cut = `rgba(0, 0, 0, ${1 - COLUMN_ALPHA})`;
+      const at = (x: number) => Math.min(1, Math.max(0, x / vw));
+      dim = ctx.createLinearGradient(0, 0, vw, 0);
+      dim.addColorStop(at(r.left - COLUMN_RAMP), 'rgba(0, 0, 0, 0)');
+      dim.addColorStop(at(r.left), cut);
+      dim.addColorStop(at(r.right), cut);
+      dim.addColorStop(at(r.right + COLUMN_RAMP), 'rgba(0, 0, 0, 0)');
+    }
   }
 
   function shouldRun() {
@@ -265,88 +234,98 @@ export function startRain() {
     );
   }
 
-  function clear() {
-    if (ctx && canvas && dirty) {
+  function stop() {
+    if (raf) cancelAnimationFrame(raf);
+    raf = 0;
+    spare.push(...live);
+    live.length = 0;
+    if (ctx) {
       ctx.setTransform(1, 0, 0, 1, 0, 0);
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
     }
-    dirty = false;
+  }
+
+  function retire(i: number) {
+    spare.push(live[i]);
+    live[i] = live[live.length - 1];
+    live.pop();
   }
 
   function frame(now: number) {
     raf = 0;
-    if (!shouldRun() || !ctx) {
-      clear();
-      return;
-    }
+    if (!shouldRun() || !ctx) return stop();
     const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
     last = now;
 
-    const s = intensity / 100;
-    const speed = 0.45 + 1.1 * s; // 50 -> 1, 100 -> 1.55
-    const len = 0.8 + 0.2 * speed; // faster rain draws slightly longer streaks
-    ensureSprites();
-
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, vw, vh);
-    dirty = true;
-
-    let r: DOMRect | null = null;
-    if (panel?.isConnected) {
-      const rect = panel.getBoundingClientRect();
-      if (rect.width > 0 && rect.height > 0) r = rect;
-    }
-    const panelVisible = !!r && r.bottom > 0 && r.top < vh && r.right > 0 && r.left < vw;
-
-    // page field: everywhere except the panel
-    page.sync(intensity);
-    page.step(dt, speed, len);
-    ctx.save();
-    if (r && panelVisible) {
-      ctx.beginPath();
-      ctx.rect(0, 0, vw, vh);
-      ctx.rect(r.left, r.top, r.width, r.height);
-      ctx.clip('evenodd');
-    }
-    page.draw(ctx, 0, 0, sprites, len);
-    ctx.restore();
-
-    // panel field: full density inside the panel (frozen while the panel is scrolled out of view)
-    if (r) {
-      panelField.resize(r.width, r.height);
-      panelField.sync(intensity);
-      if (panelVisible) {
-        panelField.step(dt, speed, len);
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(r.left, r.top, r.width, r.height);
-        ctx.clip();
-        panelField.draw(ctx, r.left, r.top, sprites, len);
-        ctx.restore();
+    // Keep `target` meteors alive: light new ones mid-sky, fade out the excess quickly.
+    const target = targetCount(intensity, diag);
+    let alive = 0;
+    for (const m of live) if (!m.die) alive++;
+    for (let i = live.length - 1; i >= 0 && alive > target; i--) {
+      if (!live[i].die) {
+        live[i].die = DYING;
+        alive--;
       }
+    }
+    for (; alive < target; alive++) live.push(launch(spare.pop() ?? ({} as Meteor), true));
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+
+    for (let i = live.length - 1; i >= 0; i--) {
+      const m = live[i];
+      m.age += dt;
+      m.d += m.v * dt;
+      if (m.die && (m.die -= dt) <= 0) {
+        retire(i);
+        continue;
+      }
+      if (m.d >= m.path) {
+        if (m.die) retire(i);
+        else launch(m, false); // reached B: relight it at a new A
+        continue;
+      }
+
+      const alpha =
+        m.a *
+        Math.min(1, m.age / FADE_IN) *
+        Math.min(1, (1 - m.d / m.path) / FADE_OUT) *
+        (m.die ? m.die / DYING : 1);
+      if (alpha < 0.01) continue;
+
+      const s = spriteFor(palette === 'nine' ? NINE_COLOURS[m.ci] : '#FFFFFF');
+      const hx = m.x + m.dx * m.d;
+      const hy = m.y + m.dy * m.d;
+      // local frame: +x along the flight, the head at the origin
+      ctx.setTransform(dpr * m.dx, dpr * m.dy, -dpr * m.dy, dpr * m.dx, dpr * hx, dpr * hy);
+      ctx.globalAlpha = alpha;
+      const tail = Math.min(m.tail, m.d - m.d0);
+      if (tail > 1) {
+        const thick = TAIL_THICK * m.w;
+        ctx.drawImage(s.tail, -tail, -thick / 2, tail, thick);
+      }
+      const r = HEAD_R * m.w * (1 + 0.35 * Math.max(0, 1 - m.age)); // a touch brighter in the first second
+      ctx.drawImage(s.head, -r, -r, r * 2, r * 2);
+    }
+
+    ctx.globalAlpha = 1;
+    if (dim) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.fillStyle = dim;
+      ctx.fillRect(0, 0, vw, vh);
+      ctx.globalCompositeOperation = 'source-over';
     }
 
     raf = requestAnimationFrame(frame);
   }
 
   function update() {
-    if (shouldRun()) {
-      if (!raf) {
-        last = performance.now();
-        raf = requestAnimationFrame(frame);
-      }
-    } else {
-      if (raf) cancelAnimationFrame(raf);
-      raf = 0;
-      clear();
+    if (!shouldRun()) return stop();
+    if (!raf) {
+      last = performance.now();
+      raf = requestAnimationFrame(frame);
     }
-  }
-
-  function syncSlider() {
-    const slider = document.getElementById('rain-slider');
-    if (!(slider instanceof HTMLInputElement)) return;
-    slider.value = String(intensity);
-    paintSlider(slider);
   }
 
   function paintSlider(slider: HTMLInputElement) {
@@ -355,10 +334,19 @@ export function startRain() {
   }
 
   function bindPage() {
-    bindCanvas();
-    // the outer #panel itself (never an inner media box), so the full-density field covers the inset margin too
-    panel = document.getElementById('panel') ?? document.querySelector<HTMLElement>('[data-panel]');
-    syncSlider();
+    const el = document.getElementById('rain');
+    const canvas = el instanceof HTMLCanvasElement ? el : null;
+    if (canvas !== ctx?.canvas) {
+      stop();
+      ctx = canvas?.getContext('2d') ?? null;
+    }
+    palette = readPalette();
+    measure();
+    const slider = document.getElementById('rain-slider');
+    if (slider instanceof HTMLInputElement) {
+      slider.value = String(intensity);
+      paintSlider(slider);
+    }
     update();
   }
 
@@ -378,19 +366,12 @@ export function startRain() {
   window.addEventListener('storage', (event) => {
     if (event.key !== RAIN_KEY) return;
     intensity = readIntensity();
-    syncSlider();
-    update();
+    bindPage();
   });
 
-  document.addEventListener(PALETTE_EVENT, (event) => {
+  window.addEventListener(PALETTE_EVENT, (event) => {
     const want = (event as CustomEvent<{ palette?: Palette } | null>).detail?.palette;
-    palette = want === 'nine' || want === 'white' ? want : palette === 'nine' ? 'white' : 'nine';
-    try {
-      if (palette === 'nine') sessionStorage.setItem(PALETTE_KEY, 'nine');
-      else sessionStorage.removeItem(PALETTE_KEY);
-    } catch {
-      /* storage blocked: the mode lasts for this page view */
-    }
+    if (want === 'nine' || want === 'white') palette = want;
   });
 
   document.addEventListener('themechange', update);
@@ -398,9 +379,10 @@ export function startRain() {
   reduceMotion.addEventListener('change', update);
   window.addEventListener('resize', measure);
 
-  // ClientRouter: the canvas persists across swaps, the panel does not.
+  // ClientRouter: the canvas persists (transition:persist) and meteors fly on through a swap. <main> and the header
+  // are replaced, so the column mask is dropped before the swap; after it the mask is remeasured and the slider synced.
   document.addEventListener('astro:before-swap', () => {
-    panel = null;
+    dim = null;
   });
   document.addEventListener('astro:after-swap', bindPage);
   document.addEventListener('astro:page-load', bindPage);

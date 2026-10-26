@@ -1,12 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); letter-spacing: 0.04em">
   <!-- Original diagram: the DCVLR data pipeline, from source images to a fine-tuned model. Generate runs down the
        left column (01-04), curate and train run up the right (05-07) to the fine-tuned model. Stroke-only lines in
-       currentColor; boxes fill with the hero window's ground (--media-ground) so the night rain never runs through
-       a label. Text: 16 units for stage names, 14.5 units (>= 11 CSS px on a 390px phone) at 0.78 opacity.
-       Nothing is drawn below y 264: on phones the night rain slider sits in the bottom-right corner. -->
+       currentColor, unfilled boxes; the page draws it on a solid box so no meteor crosses a label.
+       Text: 16 units for stage names, 14.5 units at 0.78 opacity. -->
 
   <!-- boxes -->
-  <g style="fill: var(--media-ground, none)">
+  <g>
     <rect x="16" y="22" width="128" height="44" rx="4" vector-effect="non-scaling-stroke"/>
     <rect x="16" y="88" width="128" height="44" rx="4" vector-effect="non-scaling-stroke"/>
     <rect x="16" y="154" width="128" height="44" rx="4" vector-effect="non-scaling-stroke"/>

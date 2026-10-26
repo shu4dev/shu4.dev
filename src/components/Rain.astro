@@ -1,13 +1,13 @@
 ---
 /**
- * Night-mode star rain.
+ * Night-mode meteor shower.
  * Mounted twice:
  *   <Rain />                   in Base.astro, next to <canvas id="rain">: hosts the draw loop, renders no markup
- *   <Rain variant="control" /> in Split.astro, in the panel's bottom-right corner: the "star rain" slider
- * The canvas is fixed behind the content (z-index 0, below .page). Full density inside the current page's
- * #panel rect, ~15% density everywhere else. Runs only while <html data-theme="night">, the slider is above 0,
- * the tab is visible and the user has not asked for reduced motion. Logic lives in src/scripts/rain.ts.
- * Slider: input#rain-slider, 0-100 (default 50), persisted in localStorage "rain"; scales count and speed together.
+ *   <Rain variant="control" /> in the header's .site-tools, right before <ThemeToggle />: the "meteors" slider
+ * The canvas is fixed behind the content (z-index 0, below .page) and covers the whole viewport; streaks behind
+ * <main> draw at 0.55 alpha. Runs only while <html data-theme="night">, the slider is above 0, the tab is visible
+ * and the user has not asked for reduced motion. Logic lives in src/scripts/rain.ts.
+ * Slider: input#rain-slider, 0-100 (default 50), persisted in localStorage "rain"; sets how many meteors fly at once.
  */
 interface Props {
   variant?: 'canvas' | 'control';
@@ -18,9 +18,9 @@ const { variant = 'canvas' } = Astro.props;
 
 {
   variant === 'control' && (
-    <div class="rain-control" data-rain-control>
-      <label class="mono" for="rain-slider">star rain</label>
-      <input id="rain-slider" type="range" min="0" max="100" step="1" value="50" aria-label="Star rain intensity" />
+    <div class="rain-control">
+      <label class="mono" for="rain-slider">meteors</label>
+      <input id="rain-slider" type="range" min="0" max="100" step="1" value="50" aria-valuetext="50 of 100" />
     </div>
   )
 }
@@ -41,21 +41,18 @@ const { variant = 'canvas' } = Astro.props;
     pointer-events: none;
   }
 
-  /* Night-only pill over the hero media: a near-solid night-ground fill so the label and track read over the
-     brightest video frame. Colours are the night tokens written out, so the pill does not depend on the theme. */
+  /* Night-only pill in the header, beside the theme toggle: the same 2.25rem height, on the ground colour so
+     meteors passing behind the header do not cross the label or track. */
   .rain-control {
-    --pill-bg: rgb(11 16 22 / 0.92); /* night --ground #0B1016 */
-    --pill-ink: #d9e1e6; /* night --ink */
-    --pill-edge: rgb(217 225 230 / 0.16); /* hairline, a touch firmer than --hairline so it holds over dark rain */
-
     display: none;
     align-items: center;
-    gap: var(--space-3);
-    padding: 0 var(--space-3);
-    border: 1px solid var(--pill-edge);
+    gap: var(--space-2);
+    block-size: 2.25rem;
+    padding-inline: var(--space-3) var(--space-2);
+    border: 1px solid var(--hairline);
     border-radius: 999px;
-    background: var(--pill-bg);
-    color: var(--pill-ink);
+    background: var(--ground);
+    color: var(--muted);
   }
 
   :root[data-theme='night'] .rain-control {
@@ -69,9 +66,10 @@ const { variant = 'canvas' } = Astro.props;
   }
 
   .rain-control label {
-    font-size: 0.75rem; /* 12px */
+    font-size: var(--fs-mono-sm);
     line-height: 1;
-    color: var(--pill-ink);
+    letter-spacing: var(--tracking-mono);
+    color: inherit;
     white-space: nowrap;
     cursor: pointer;
     user-select: none;
@@ -82,12 +80,12 @@ const { variant = 'canvas' } = Astro.props;
     --track: 2px;
     --thumb: 0.75rem;
     --track-color: rgb(217 225 230 / 0.28);
-    --fill-color: var(--pill-ink, #d9e1e6);
+    --fill-color: var(--ink);
     --rain-fill: 50%;
 
     appearance: none;
-    inline-size: 6.5rem;
-    block-size: 1.75rem;
+    inline-size: 6rem;
+    block-size: 100%;
     margin: 0;
     padding: 0;
     border: 0;
@@ -96,11 +94,20 @@ const { variant = 'canvas' } = Astro.props;
     cursor: pointer;
   }
 
+  @media (hover: hover) {
+    .rain-control:hover {
+      color: var(--ink);
+    }
+  }
+
+  /* touch: a bigger thumb and a 44px-tall pill */
   @media (pointer: coarse) {
+    .rain-control {
+      block-size: 2.75rem;
+    }
+
     #rain-slider {
       --thumb: 1rem;
-      inline-size: 7.5rem;
-      block-size: 2.75rem;
     }
   }
 
@@ -148,8 +155,13 @@ const { variant = 'canvas' } = Astro.props;
     background: var(--fill-color);
   }
 
+  /* the focus ring goes round the whole pill, not just the track */
   #rain-slider:focus-visible {
+    outline: none;
+  }
+
+  .rain-control:has(#rain-slider:focus-visible) {
     outline: 2px solid var(--focus);
-    outline-offset: 3px;
+    outline-offset: 2px;
   }
 </style>

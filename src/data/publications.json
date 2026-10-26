@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Fiatlux: A Long-Horizon Benchmark for Humanoid Ladder Climbing and Light-Bulb Replacement",
+    "venue": "arXiv 2026 · under review at IEEE ICRA 2027",
+    "authors": ["P. Bushuyeu*", "Y. Chen*", "A. Nikolaev*", "B. Shu*", "I. Molybog"],
+    "note": "*equal contribution, alphabetical",
+    "summary": "A 12-subtask benchmark in NVIDIA Isaac Lab in which a simulated Unitree G1 humanoid moves a ladder, climbs it and replaces a ceiling light bulb.",
+    "image": "/media/fiatlux/S01.jpg",
+    "imageAlt": "The G1 crouching beside an A-frame ladder and gripping it to move it under the ceiling fixture.",
+    "links": [
+      { "label": "Paper", "href": "https://arxiv.org/abs/2609.38216" },
+      { "label": "Project page", "href": "https://fiatlux-bench.github.io" },
+      { "label": "Site page", "href": "/projects/fiatlux/" }
+    ]
+  }
+]

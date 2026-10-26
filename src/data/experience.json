@@ -1,0 +1,37 @@
+[
+  {
+    "org": "CoRAL Lab, Purdue",
+    "role": "Graduate Researcher",
+    "place": "West Lafayette",
+    "dates": "Aug 2026 – present",
+    "line": "Building a general dishwasher-loading manipulation policy in NVIDIA Isaac Lab; released the simulated dish assets."
+  },
+  {
+    "org": "HawAII, UH Mānoa",
+    "role": "Research Assistant",
+    "place": "Honolulu",
+    "dates": "Mar – Sep 2026",
+    "line": "Built the 12 subtask environments and asset pipeline for the Fiatlux benchmark, and the force-monitored expert and imitation-learning pipeline for the AI for Industry Challenge."
+  },
+  {
+    "org": "Hyundai Card",
+    "role": "Data Science Intern",
+    "place": "Seoul",
+    "dates": "Jun – Jul 2025",
+    "line": "RAG pipeline for text-to-SQL with self-consistency decoding; migrated to an open-source model while keeping 80% execution accuracy."
+  },
+  {
+    "org": "UH Mānoa",
+    "role": "Software Verification Developer",
+    "place": "Honolulu",
+    "dates": "May 2024 – May 2025",
+    "line": "Isabelle/HOL proofs of functional correctness, following the seL4 and RT-11 verification efforts."
+  },
+  {
+    "org": "UH Mānoa",
+    "role": "Research Assistant",
+    "place": "Honolulu",
+    "dates": "Jun – Aug 2023",
+    "line": "Efficient simulation of a biological reaction model, with 2D and 3D visualization of the results."
+  }
+]

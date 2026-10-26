@@ -1,15 +1,14 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); letter-spacing: 0.04em">
-  <!-- Original diagram: the privileged expert's insertion-and-recovery loop. Stroke-only lines in currentColor;
-       boxes fill with the hero window's ground (--media-ground) so the night rain never runs through a label.
-       Text: 16 units for stage names, 14.5 units (>= 11 CSS px on a 390px phone) at 0.78 opacity (>= 4.5:1).
-       Below y 264 only the legend (x < 116) is drawn: on phones the night rain slider sits in that corner. -->
+  <!-- Original diagram: the privileged expert's insertion-and-recovery loop. Stroke-only lines in currentColor,
+       unfilled boxes; the page draws it on a solid box so no meteor crosses a label.
+       Text: 16 units for stage names, 14.5 units at 0.78 opacity (>= 4.5:1). -->
 
   <!-- force trace beside "insert": a spike past the limit is what a jam looks like -->
   <path d="M16 92H120" stroke-dasharray="2 4" stroke-opacity="0.55" vector-effect="non-scaling-stroke"/>
   <path d="M16 120L28 119L40 117.5L52 115.5L62 113L70 109.5L76 103L80 92L84 76L88 94L93 104L100 108.5L110 110.5L120 111" vector-effect="non-scaling-stroke"/>
 
   <!-- boxes -->
-  <g style="fill: var(--media-ground, none)">
+  <g>
     <rect x="150" y="10" width="100" height="40" rx="4" vector-effect="non-scaling-stroke"/>
     <rect x="136" y="68" width="128" height="56" rx="4" vector-effect="non-scaling-stroke"/>
     <path d="M200 142L246 172L200 202L154 172Z" vector-effect="non-scaling-stroke"/>

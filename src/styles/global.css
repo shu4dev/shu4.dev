@@ -12,15 +12,8 @@
   --accent-ink: #ffffff;
   --hairline: rgb(38 50 56 / 0.12);
   --focus: var(--accent);
-  --panel-bg: var(--surface);
-  --media-opacity: 1;
-  /* hero window (Hero.astro): edge to edge by day. At night it sits inset in #panel (a size container, so cqmin
-     is the panel's shorter side) behind a hairline, and the star rain frames it. --media-ground is the window's
-     own ground; diagram boxes fill with it so rain never crosses a label. */
-  --media-inset: 0px;
-  --media-radius: 0px;
-  --media-edge: transparent;
-  --media-ground: var(--surface);
+  /* muted text on --surface (cards): #607078 on #E4E9EB is 4.2:1, so cards darken it to 4.9:1 */
+  --muted-surface: #56666e;
   /* paper plate behind white-background figures (.prose figure.paper), the same in both themes */
   --paper: #ffffff;
 
@@ -50,12 +43,9 @@
   --space-7: 3rem;
   --space-8: 4.5rem;
   --space-9: 6rem;
-  --gutter: clamp(1rem, 0.4rem + 2.6vw, 3.5rem);
-
-  /* layout: split stage at >= 960px, panel 45% / column 55% */
-  --panel-fr: 45fr;
-  --column-fr: 55fr;
-  --panel-phone-height: 40svh;
+  --gutter: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+  /* layout: one column, 1120px of content */
+  --content: 1120px;
 
   /* motion */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
@@ -73,12 +63,7 @@
   --accent: #6fc2cc;
   --accent-ink: #0b1016;
   --hairline: rgb(217 225 230 / 0.12);
-  --panel-bg: transparent;
-  --media-opacity: 0.92;
-  --media-inset: clamp(16px, 6cqmin, 48px);
-  --media-radius: 4px;
-  --media-edge: rgb(217 225 230 / 0.18);
-  --media-ground: var(--ground);
+  --muted-surface: var(--muted);
   color-scheme: dark;
 }
 
@@ -91,12 +76,7 @@
     --accent: #6fc2cc;
     --accent-ink: #0b1016;
     --hairline: rgb(217 225 230 / 0.12);
-    --panel-bg: transparent;
-    --media-opacity: 0.92;
-    --media-inset: clamp(16px, 6cqmin, 48px);
-    --media-radius: 4px;
-    --media-edge: rgb(217 225 230 / 0.18);
-    --media-ground: var(--ground);
+    --muted-surface: var(--muted);
     color-scheme: dark;
   }
 }
@@ -355,4 +335,114 @@ a {
   border: 0;
   border-top: 1px solid var(--hairline);
   margin-block: var(--space-6);
+}
+
+/* ---------- buttons (hero links) ---------- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.5rem;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  color: var(--ink);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  white-space: nowrap;
+  transition:
+    border-color var(--dur-fast) ease,
+    background-color var(--dur-fast) ease;
+}
+
+.btn-primary {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+@media (hover: hover) {
+  .btn:hover {
+    border-color: var(--muted);
+    text-decoration-line: none;
+  }
+
+  .btn-primary:hover {
+    border-color: var(--ink);
+  }
+}
+
+/* ---------- cards (home: projects, publications) ---------- */
+
+.card-list {
+  display: grid;
+  gap: var(--space-4);
+  padding: 0;
+  list-style: none;
+}
+
+/* thumbnail 280px left of the text; 220px under 1100px; stacked under 760px */
+.card {
+  --muted: var(--muted-surface);
+  display: grid;
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: var(--space-5);
+  padding: var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+@media (max-width: 1099px) {
+  .card {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 759px) {
+  .card {
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-4);
+  }
+}
+
+.card-thumb {
+  align-self: start;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  background: var(--ground);
+}
+
+.card-body {
+  display: grid;
+  align-content: start;
+  gap: var(--space-2);
+}
+
+.card-meta {
+  color: var(--muted);
+  font-size: var(--fs-mono-sm);
+}
+
+.card-title {
+  font-size: 1.1875rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+}
+
+.card-title a {
+  color: var(--ink);
+}
+
+.card-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-4);
+  margin-top: var(--space-1);
+  padding: 0;
+  list-style: none;
+  font-size: var(--fs-small);
+  font-weight: 500;
 }

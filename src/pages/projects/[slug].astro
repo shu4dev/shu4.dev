@@ -1,6 +1,6 @@
 ---
 import { getCollection, render, type CollectionEntry } from 'astro:content';
-import Split from '../../layouts/Split.astro';
+import Base from '../../layouts/Base.astro';
 import Hero from '../../components/Hero.astro';
 
 export async function getStaticPaths() {
@@ -21,13 +21,14 @@ const { title, summary, year, tags, status, hero, links } = entry.data;
 const { Content } = await render(entry);
 ---
 
-<Split title={title} description={summary} type="article">
-  <Hero slot="panel" hero={hero} />
-
+<Base title={title} description={summary} type="article">
   <article class="project" aria-labelledby="project-title">
     <p><a class="back mono" href="/#projects">← All projects</a></p>
 
     <header class="project-header">
+      <ul class="tags" aria-label="Tags">
+        {tags.map((t) => <li class="tag">{t}</li>)}
+      </ul>
       <h1 id="project-title">{title}</h1>
       <p class="lead">{summary}</p>
       <dl class="meta">
@@ -43,18 +44,12 @@ const { Content } = await render(entry);
             </div>
           )
         }
-        <div class="meta-tags">
-          <dt class="mono">Tags</dt>
-          <dd>
-            <ul class="tags">
-              {tags.map((t) => (
-                <li class="tag">{t}</li>
-              ))}
-            </ul>
-          </dd>
-        </div>
       </dl>
     </header>
+
+    <div class="project-media" data-kind={hero.kind}>
+      <Hero hero={hero} />
+    </div>
 
     <div class="prose">
       <Content />
@@ -80,11 +75,11 @@ const { Content } = await render(entry);
       <a href={`/projects/${next.id}/`}>{next.data.title} →</a>
     </nav>
   </article>
-</Split>
+</Base>
 
 <style>
   .project {
-    padding-top: var(--space-5);
+    padding-top: var(--space-3);
   }
 
   .back {
@@ -99,17 +94,15 @@ const { Content } = await render(entry);
 
   .project-header {
     display: grid;
-    gap: var(--space-4);
+    gap: var(--space-3);
     margin-top: var(--space-6);
-    padding-bottom: var(--space-5);
-    border-bottom: 1px solid var(--hairline);
   }
 
   .meta {
     display: flex;
     flex-wrap: wrap;
     gap: var(--space-3) var(--space-6);
-    margin-top: var(--space-2);
+    margin-top: var(--space-1);
   }
 
   .meta dt {
@@ -122,8 +115,26 @@ const { Content } = await render(entry);
     color: var(--ink);
   }
 
-  .meta-tags dd {
-    padding-top: 0.15em;
+  /* full-width stage: 16:9 (4:3 on phones), never taller than 70vh; media contained on --surface */
+  .project-media {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 70vh;
+    margin-block: var(--space-6) var(--space-7);
+    overflow: hidden;
+    border: 1px solid var(--hairline);
+    border-radius: 8px;
+    background: var(--surface);
+  }
+
+  @media (max-width: 759px) {
+    .project-media {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  .project-media :global(.media) {
+    object-fit: contain;
   }
 
   .links {

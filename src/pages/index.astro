@@ -1,171 +1,229 @@
 ---
 import { getCollection } from 'astro:content';
-import Split from '../layouts/Split.astro';
-import Hero from '../components/Hero.astro';
+import Base from '../layouts/Base.astro';
 import ProjectList from '../components/ProjectList.astro';
 import Contact from '../components/Contact.astro';
+import publications from '../data/publications.json';
+import experience from '../data/experience.json';
 import moreWork from '../data/more-work.json';
 import { Content as About, frontmatter as about } from '../content/about.md';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
-const featured = projects.find((p) => p.id === 'fiatlux') ?? projects[0];
 ---
 
-<Split description={about.description}>
-  <Hero slot="panel" hero={featured.data.hero} />
-
-  <section class="identity" aria-labelledby="intro-title">
+<Base description={about.description}>
+  <section class="intro" aria-labelledby="intro-title">
     <img class="portrait" src="/media/portrait.jpg" alt="Brian Shu" width="200" height="200" decoding="async" />
-    <p class="eyebrow mono">M.S. Computer Science, Purdue · CoRAL Lab</p>
-    <h1 id="intro-title">Brian Shu</h1>
-    <p class="lead">Robot learning for long-horizon manipulation.</p>
-    <p class="availability mono">
-      Looking for a Summer 2027 research internship · available <span class="nowrap">May 10 – Aug 20, 2027</span>
-    </p>
+    <div class="intro-text">
+      <h1 id="intro-title">Brian Shu</h1>
+      <p class="eyebrow mono">M.S. Computer Science, Purdue · CoRAL Lab</p>
+      <div class="prose bio">
+        <About />
+      </div>
+      <Contact variant="buttons" />
+    </div>
   </section>
-
-  <div class="prose about">
-    <About />
-  </div>
 
   <section id="projects" class="block" aria-labelledby="projects-title">
     <h2 id="projects-title">Projects</h2>
+    <p class="block-intro">Four projects, each with its own page: what I built, media from the simulator, and the code.</p>
     <ProjectList projects={projects} />
   </section>
 
-  <section class="block" aria-labelledby="more-title">
-    <h2 id="more-title">More work</h2>
-    <ul class="more-list" role="list">
+  <section id="publications" class="block" aria-labelledby="publications-title">
+    <h2 id="publications-title">Publications</h2>
+    <ol class="card-list" role="list">
+      {
+        publications.map((pub) => (
+          <li class="card">
+            <div class="card-thumb">
+              <img class="pub-img" src={pub.image} alt={pub.imageAlt} loading="lazy" decoding="async" />
+            </div>
+            <div class="card-body">
+              <p class="card-meta mono">{pub.venue}</p>
+              <h3 class="card-title">{pub.title}</h3>
+              <p class="authors">
+                {pub.authors.map((a, i) => (
+                  <>
+                    {a.replace('*', '') === 'B. Shu' ? <strong>{a}</strong> : a}
+                    {i < pub.authors.length - 1 && ', '}
+                  </>
+                ))}
+                <span class="note"> · {pub.note}</span>
+              </p>
+              <p>{pub.summary}</p>
+              <ul class="card-links" role="list">
+                {pub.links.map((l) => (
+                  <li>
+                    <a href={l.href}>{l.label}</a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+  </section>
+
+  <section id="experience" class="block" aria-labelledby="experience-title">
+    <h2 id="experience-title">Experience</h2>
+    <ul class="rows" role="list">
+      {
+        experience.map((e) => (
+          <li>
+            <div class="row-head">
+              <span>
+                <strong>{e.org}</strong> — {e.role}
+              </span>
+              <span class="row-meta mono">
+                {e.place} · {e.dates}
+              </span>
+            </div>
+            <p class="row-line">{e.line}</p>
+          </li>
+        ))
+      }
+    </ul>
+
+    <h3 class="more-title">More work</h3>
+    <ul class="rows" role="list">
       {
         moreWork.map((item) => (
           <li>
-            <div class="more-head">
-              <span class="more-title">{item.title}</span>
-              <span class="more-meta mono">{item.meta}</span>
+            <div class="row-head">
+              <span class="row-title">{item.title}</span>
+              <span class="row-meta mono">{item.meta}</span>
             </div>
-            <p class="more-line">{item.line}</p>
+            <p class="row-line">{item.line}</p>
           </li>
         ))
       }
     </ul>
   </section>
 
-  <section class="block" aria-labelledby="contact-title">
+  <section id="contact" class="block" aria-labelledby="contact-title">
     <h2 id="contact-title">Contact</h2>
-    <Contact variant="full" />
+    <p class="block-intro">
+      Email is the quickest way to reach me: <a href="mailto:brianshu0915@gmail.com">brianshu0915@gmail.com</a>. I'm also on GitHub,
+      Hugging Face and LinkedIn.
+    </p>
+    <Contact variant="icons" />
   </section>
-</Split>
+</Base>
 
 <style>
-  /* identity: portrait left of eyebrow, name, lead, availability. Phones: the portrait sits beside eyebrow and
-     name only; lead and availability run full width under it. The 200px source is never shown above 2x. */
-  .identity {
+  /* text left, round 200px portrait right; phones: portrait first (160px), centred */
+  .intro {
     display: grid;
-    grid-template-columns: 80px minmax(0, 1fr);
-    grid-template-areas:
-      'portrait eyebrow'
-      'portrait name'
-      'lead lead'
-      'avail avail';
-    column-gap: var(--space-4);
-    padding-top: var(--space-6);
+    justify-items: center;
+    gap: var(--space-5);
+    padding-top: var(--space-4);
   }
 
   .portrait {
-    grid-area: portrait;
-    align-self: center;
-    width: 80px;
-    height: 80px;
+    width: 160px;
+    height: 160px;
     border: 1px solid var(--hairline);
     border-radius: 50%;
     background: var(--surface);
     object-fit: cover;
   }
 
+  .intro-text {
+    display: grid;
+    justify-self: stretch;
+    gap: var(--space-4);
+  }
+
   .eyebrow {
-    grid-area: eyebrow;
-    align-self: end;
-  }
-
-  .identity h1 {
-    grid-area: name;
-    align-self: start;
-    margin-top: var(--space-1);
-  }
-
-  .identity .lead {
-    grid-area: lead;
-    margin-top: var(--space-4);
-    font-size: 1.25rem;
-    font-weight: 500;
-    line-height: 1.4;
-    letter-spacing: -0.01em;
-  }
-
-  .availability {
-    grid-area: avail;
-    margin-top: var(--space-3);
-  }
-
-  .eyebrow,
-  .availability {
+    margin-top: calc(var(--space-2) * -1);
     color: var(--muted);
   }
 
-  /* the date range never breaks across lines */
-  .nowrap {
-    white-space: nowrap;
+  .bio > * + * {
+    margin-top: 0.75em;
   }
 
-  @media (min-width: 40rem) {
-    .identity {
-      grid-template-columns: 96px minmax(0, 1fr);
-      grid-template-areas:
-        'portrait eyebrow'
-        'portrait name'
-        'portrait lead'
-        'portrait avail';
-      column-gap: var(--space-5);
+  @media (min-width: 760px) {
+    .intro {
+      grid-template-columns: minmax(0, 1fr) 200px;
+      align-items: center;
+      gap: 48px;
+      min-height: 420px;
+      padding-top: var(--space-5);
     }
 
     .portrait {
-      width: 96px;
-      height: 96px;
+      grid-column: 2;
+      grid-row: 1;
+      width: 200px;
+      height: 200px;
     }
 
-    .identity .lead {
-      margin-top: var(--space-2);
+    .intro-text {
+      grid-column: 1;
+      grid-row: 1;
     }
-  }
-
-  .about {
-    margin-top: var(--space-7);
   }
 
   .block {
     margin-top: var(--space-8);
-    scroll-margin-top: var(--space-5);
+    scroll-margin-top: 6.5rem;
   }
 
   .block > h2 {
+    margin-bottom: var(--space-3);
+  }
+
+  .block-intro {
+    max-width: var(--measure);
+    margin-bottom: var(--space-5);
+    color: var(--muted);
+  }
+
+  #publications > h2 {
     margin-bottom: var(--space-5);
   }
 
-  .more-list {
+  .pub-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .authors {
+    font-size: var(--fs-small);
+  }
+
+  .authors strong {
+    font-weight: 600;
+  }
+
+  .note {
+    color: var(--muted);
+  }
+
+  /* experience and more work: hairline-separated text rows */
+  .rows {
     margin: 0;
     padding: 0;
     list-style: none;
     border-bottom: 1px solid var(--hairline);
   }
 
-  .more-list li {
+  #experience > h2 {
+    margin-bottom: var(--space-5);
+  }
+
+  .rows li {
     display: grid;
     gap: var(--space-1);
     padding-block: var(--space-3);
     border-top: 1px solid var(--hairline);
   }
 
-  .more-head {
+  .row-head {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -173,18 +231,29 @@ const featured = projects.find((p) => p.id === 'fiatlux') ?? projects[0];
     column-gap: var(--space-4);
   }
 
-  .more-title {
-    font-weight: 500;
+  .row-head strong,
+  .row-title {
+    font-weight: 600;
   }
 
-  .more-meta {
+  .row-meta {
     color: var(--muted);
     font-size: var(--fs-mono-sm);
   }
 
-  .more-line {
+  .row-line {
     max-width: var(--measure);
     color: var(--muted);
     font-size: var(--fs-small);
+  }
+
+  .more-title {
+    margin: var(--space-7) 0 var(--space-3);
+    font-size: var(--fs-h3);
+    font-weight: 600;
+  }
+
+  #contact .block-intro {
+    margin-bottom: var(--space-3);
   }
 </style>

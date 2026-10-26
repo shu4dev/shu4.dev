@@ -1,101 +1,55 @@
 ---
 /**
- * Featured projects on the home page. Each row: title (link to /projects/<id>/), one line, year, tags.
- * The whole row is clickable through the title link's stretched ::after.
+ * Project cards on the home page, in collection order: thumbnail (Hero thumb) left, text right
+ * (year · tags, title linking to /projects/<id>/, summary, links). Card layout lives in global.css (.card).
  */
 import type { CollectionEntry } from 'astro:content';
+import Hero from './Hero.astro';
 
 interface Props {
   projects: CollectionEntry<'projects'>[];
 }
 
 const { projects } = Astro.props;
+
+// frontmatter labels read "Paper (arXiv:...)": the row shows the part before the brackets,
+// or the whole label when that part is already taken (Fiatlux's external "Project page")
+function rowLinks(links: { label: string; href: string }[]) {
+  const seen = new Set(['Project page']);
+  return links.map((l) => {
+    const short = l.label.replace(/\s*\(.*\)$/, '');
+    const text = seen.has(short) ? l.label : short;
+    seen.add(short);
+    return { href: l.href, text };
+  });
+}
 ---
 
-<ol class="project-list" role="list">
+<ol class="card-list" role="list">
   {
     projects.map((p) => (
-      <li class="project">
-        <div class="project-head">
-          <h3 class="project-title">
+      <li class="card">
+        <div class="card-thumb">
+          <Hero hero={p.data.hero} thumb />
+        </div>
+        <div class="card-body">
+          <p class="card-meta mono">{[p.data.year, ...p.data.tags].join(' · ')}</p>
+          <h3 class="card-title">
             <a href={`/projects/${p.id}/`}>{p.data.title}</a>
           </h3>
-          <span class="project-year mono">{p.data.year}</span>
+          <p>{p.data.summary}</p>
+          <ul class="card-links" role="list">
+            <li>
+              <a href={`/projects/${p.id}/`}>Project page</a>
+            </li>
+            {rowLinks(p.data.links).map((l) => (
+              <li>
+                <a href={l.href}>{l.text}</a>
+              </li>
+            ))}
+          </ul>
         </div>
-        <p class="project-summary">{p.data.summary}</p>
-        <ul class="tags" aria-label="Tags">
-          {p.data.tags.map((t) => (
-            <li class="tag">{t}</li>
-          ))}
-        </ul>
       </li>
     ))
   }
 </ol>
-
-<style>
-  .project-list {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-    border-bottom: 1px solid var(--hairline);
-  }
-
-  .project {
-    position: relative;
-    display: grid;
-    gap: var(--space-2);
-    padding-block: var(--space-5);
-    border-top: 1px solid var(--hairline);
-  }
-
-  .project-head {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: var(--space-4);
-  }
-
-  .project-title {
-    font-size: 1.25rem;
-    font-weight: 600;
-    letter-spacing: -0.015em;
-  }
-
-  .project-title a {
-    color: var(--ink);
-  }
-
-  .project-title a::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-  }
-
-  @media (hover: hover) {
-    .project:hover .project-title a {
-      text-decoration-line: underline;
-      text-decoration-color: var(--accent);
-    }
-  }
-
-  .project-title a:focus-visible {
-    outline: none;
-  }
-
-  .project-title a:focus-visible::after {
-    outline: 2px solid var(--focus);
-    outline-offset: 2px;
-    border-radius: 2px;
-  }
-
-  .project-year {
-    flex: none;
-    color: var(--muted);
-  }
-
-  .project-summary {
-    max-width: var(--measure);
-    color: var(--ink);
-  }
-</style>

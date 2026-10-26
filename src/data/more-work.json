@@ -1,20 +1,5 @@
 [
   {
-    "title": "Hyundai Card",
-    "meta": "Data Science Intern · Seoul · 2025",
-    "line": "RAG pipeline for text-to-SQL with self-consistency decoding; migrated to an open-source model while keeping 80% execution accuracy."
-  },
-  {
-    "title": "Software verification, UH Mānoa",
-    "meta": "Software Verification Developer · 2024–2025",
-    "line": "Isabelle/HOL proofs of functional correctness, following the seL4 and RT-11 verification efforts."
-  },
-  {
-    "title": "Biological reaction simulation, UH Mānoa",
-    "meta": "Research Assistant · 2023",
-    "line": "Efficient simulation of a biological reaction model, with 2D and 3D visualization of the results."
-  },
-  {
     "title": "Jane Street Real-Time Market Data Forecasting",
     "meta": "Kaggle",
     "line": "Supervised autoencoder + MLP; ranked 440 of 3,000 (top 15%)."
