@@ -1,0 +1,155 @@
+---
+/**
+ * Night-mode star rain.
+ * Mounted twice:
+ *   <Rain />                   in Base.astro, next to <canvas id="rain">: hosts the draw loop, renders no markup
+ *   <Rain variant="control" /> in Split.astro, in the panel's bottom-right corner: the "star rain" slider
+ * The canvas is fixed behind the content (z-index 0, below .page). Full density inside the current page's
+ * #panel rect, ~15% density everywhere else. Runs only while <html data-theme="night">, the slider is above 0,
+ * the tab is visible and the user has not asked for reduced motion. Logic lives in src/scripts/rain.ts.
+ * Slider: input#rain-slider, 0-100 (default 50), persisted in localStorage "rain"; scales count and speed together.
+ */
+interface Props {
+  variant?: 'canvas' | 'control';
+}
+
+const { variant = 'canvas' } = Astro.props;
+---
+
+{
+  variant === 'control' && (
+    <div class="rain-control" data-rain-control>
+      <label class="mono" for="rain-slider">star rain</label>
+      <input id="rain-slider" type="range" min="0" max="100" step="1" value="50" aria-label="Star rain intensity" />
+    </div>
+  )
+}
+
+<script>
+  import { startRain } from '../scripts/rain';
+
+  startRain();
+</script>
+
+<style is:global>
+  #rain {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Night-only pill over the hero media: a near-solid night-ground fill so the label and track read over the
+     brightest video frame. Colours are the night tokens written out, so the pill does not depend on the theme. */
+  .rain-control {
+    --pill-bg: rgb(11 16 22 / 0.92); /* night --ground #0B1016 */
+    --pill-ink: #d9e1e6; /* night --ink */
+    --pill-edge: rgb(217 225 230 / 0.16); /* hairline, a touch firmer than --hairline so it holds over dark rain */
+
+    display: none;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 0 var(--space-3);
+    border: 1px solid var(--pill-edge);
+    border-radius: 999px;
+    background: var(--pill-bg);
+    color: var(--pill-ink);
+  }
+
+  :root[data-theme='night'] .rain-control {
+    display: flex;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root[data-theme='night'] .rain-control {
+      display: none;
+    }
+  }
+
+  .rain-control label {
+    font-size: 0.75rem; /* 12px */
+    line-height: 1;
+    color: var(--pill-ink);
+    white-space: nowrap;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  /* Native range input, restyled: hairline track, ink fill, small round thumb. --rain-fill is set by the script. */
+  #rain-slider {
+    --track: 2px;
+    --thumb: 0.75rem;
+    --track-color: rgb(217 225 230 / 0.28);
+    --fill-color: var(--pill-ink, #d9e1e6);
+    --rain-fill: 50%;
+
+    appearance: none;
+    inline-size: 6.5rem;
+    block-size: 1.75rem;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 999px;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  @media (pointer: coarse) {
+    #rain-slider {
+      --thumb: 1rem;
+      inline-size: 7.5rem;
+      block-size: 2.75rem;
+    }
+  }
+
+  #rain-slider::-webkit-slider-runnable-track {
+    block-size: var(--track);
+    border: 0;
+    border-radius: 999px;
+    background: linear-gradient(to right, var(--fill-color) var(--rain-fill), var(--track-color) var(--rain-fill));
+  }
+
+  #rain-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    inline-size: var(--thumb);
+    block-size: var(--thumb);
+    margin-block-start: calc((var(--track) - var(--thumb)) / 2);
+    border: 0;
+    border-radius: 50%;
+    background: var(--fill-color);
+    transition: scale var(--dur-fast) var(--ease-out);
+  }
+
+  #rain-slider:active::-webkit-slider-thumb {
+    scale: 1.2;
+  }
+
+  #rain-slider::-moz-range-track {
+    block-size: var(--track);
+    border: 0;
+    border-radius: 999px;
+    background: var(--track-color);
+  }
+
+  #rain-slider::-moz-range-progress {
+    block-size: var(--track);
+    border-radius: 999px;
+    background: var(--fill-color);
+  }
+
+  #rain-slider::-moz-range-thumb {
+    inline-size: var(--thumb);
+    block-size: var(--thumb);
+    border: 0;
+    border-radius: 50%;
+    background: var(--fill-color);
+  }
+
+  #rain-slider:focus-visible {
+    outline: 2px solid var(--focus);
+    outline-offset: 3px;
+  }
+</style>

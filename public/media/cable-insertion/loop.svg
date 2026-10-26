@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 320" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace); letter-spacing: 0.04em">
+  <!-- Original diagram: the privileged expert's insertion-and-recovery loop. Stroke-only lines in currentColor;
+       boxes fill with the hero window's ground (--media-ground) so the night rain never runs through a label.
+       Text: 16 units for stage names, 14.5 units (>= 11 CSS px on a 390px phone) at 0.78 opacity (>= 4.5:1).
+       Below y 264 only the legend (x < 116) is drawn: on phones the night rain slider sits in that corner. -->
+
+  <!-- force trace beside "insert": a spike past the limit is what a jam looks like -->
+  <path d="M16 92H120" stroke-dasharray="2 4" stroke-opacity="0.55" vector-effect="non-scaling-stroke"/>
+  <path d="M16 120L28 119L40 117.5L52 115.5L62 113L70 109.5L76 103L80 92L84 76L88 94L93 104L100 108.5L110 110.5L120 111" vector-effect="non-scaling-stroke"/>
+
+  <!-- boxes -->
+  <g style="fill: var(--media-ground, none)">
+    <rect x="150" y="10" width="100" height="40" rx="4" vector-effect="non-scaling-stroke"/>
+    <rect x="136" y="68" width="128" height="56" rx="4" vector-effect="non-scaling-stroke"/>
+    <path d="M200 142L246 172L200 202L154 172Z" vector-effect="non-scaling-stroke"/>
+    <rect x="154" y="220" width="92" height="40" rx="4" vector-effect="non-scaling-stroke"/>
+    <rect x="284" y="150" width="104" height="44" rx="4" vector-effect="non-scaling-stroke"/>
+  </g>
+  <!-- terminal state: tinted, double edge -->
+  <rect x="154" y="220" width="92" height="40" rx="4" stroke="none" fill="currentColor" fill-opacity="0.06"/>
+  <rect x="157.5" y="223.5" width="85" height="33" rx="2" vector-effect="non-scaling-stroke"/>
+
+  <!-- nominal path: approach, insert, jam?, seated -->
+  <path d="M200 50V66M196 60L200 66L204 60" vector-effect="non-scaling-stroke"/>
+  <path d="M200 124V140M196 134L200 140L204 134" vector-effect="non-scaling-stroke"/>
+  <path d="M200 202V218M196 212L200 218L204 212" vector-effect="non-scaling-stroke"/>
+
+  <!-- recovery path: jam detected, back off, retry the insertion -->
+  <path d="M246 172H282" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+  <path d="M276 168L282 172L276 176" vector-effect="non-scaling-stroke"/>
+  <path d="M336 150V96H266" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+  <path d="M272 92L266 96L272 100" vector-effect="non-scaling-stroke"/>
+
+  <!-- labels -->
+  <g stroke="none" fill="currentColor" font-size="16" text-anchor="middle">
+    <text x="200" y="36">approach</text>
+    <text x="200" y="92">insert</text>
+    <text x="200" y="178">jam?</text>
+    <text x="200" y="246">seated</text>
+    <text x="336" y="178">back off</text>
+  </g>
+  <g stroke="none" fill="currentColor" font-size="14.5" fill-opacity="0.78">
+    <text x="200" y="113" text-anchor="middle">watch force</text>
+    <text x="16" y="64">force</text>
+    <text x="16" y="85">limit</text>
+    <text x="209" y="214">no</text>
+    <text x="265" y="163" text-anchor="middle">yes</text>
+    <text x="301" y="88" text-anchor="middle">retry</text>
+    <text x="388" y="24" text-anchor="end">privileged</text>
+    <text x="388" y="42" text-anchor="end">expert</text>
+  </g>
+
+  <!-- legend -->
+  <path d="M16 290H32" vector-effect="non-scaling-stroke"/>
+  <path d="M16 309H32" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"/>
+  <g stroke="none" fill="currentColor" font-size="14.5" fill-opacity="0.78">
+    <text x="40" y="295">nominal</text>
+    <text x="40" y="314">recovery</text>
+  </g>
+</svg>

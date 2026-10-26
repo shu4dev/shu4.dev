@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <style>
+    rect { fill: #2E6F77; }
+    path { stroke: #FFFFFF; }
+    @media (prefers-color-scheme: dark) {
+      rect { fill: #6FC2CC; }
+      path { stroke: #0B1016; }
+    }
+  </style>
+  <rect width="32" height="32" rx="7"/>
+  <path d="M11 6v20M21 6v20M11 10.5h10M11 16h10M11 21.5h10" fill="none" stroke-width="2" stroke-linecap="round"/>
+</svg>

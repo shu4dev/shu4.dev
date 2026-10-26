@@ -1,0 +1,163 @@
+---
+import { getCollection, render, type CollectionEntry } from 'astro:content';
+import Split from '../../layouts/Split.astro';
+import Hero from '../../components/Hero.astro';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((entry, i) => ({
+    params: { slug: entry.id },
+    props: { entry, next: projects[(i + 1) % projects.length] },
+  }));
+}
+
+type Props = {
+  entry: CollectionEntry<'projects'>;
+  next: CollectionEntry<'projects'>;
+};
+
+const { entry, next } = Astro.props;
+const { title, summary, year, tags, status, hero, links } = entry.data;
+const { Content } = await render(entry);
+---
+
+<Split title={title} description={summary} type="article">
+  <Hero slot="panel" hero={hero} />
+
+  <article class="project" aria-labelledby="project-title">
+    <p><a class="back mono" href="/#projects">← All projects</a></p>
+
+    <header class="project-header">
+      <h1 id="project-title">{title}</h1>
+      <p class="lead">{summary}</p>
+      <dl class="meta">
+        <div>
+          <dt class="mono">Year</dt>
+          <dd class="mono">{year}</dd>
+        </div>
+        {
+          status && (
+            <div>
+              <dt class="mono">Status</dt>
+              <dd class="mono">{status}</dd>
+            </div>
+          )
+        }
+        <div class="meta-tags">
+          <dt class="mono">Tags</dt>
+          <dd>
+            <ul class="tags">
+              {tags.map((t) => (
+                <li class="tag">{t}</li>
+              ))}
+            </ul>
+          </dd>
+        </div>
+      </dl>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    {
+      links.length > 0 && (
+        <section class="links" aria-labelledby="links-title">
+          <h2 id="links-title">Links</h2>
+          <ul role="list">
+            {links.map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )
+    }
+
+    <nav class="next" aria-label="Next project">
+      <span class="mono muted">Next project</span>
+      <a href={`/projects/${next.id}/`}>{next.data.title} →</a>
+    </nav>
+  </article>
+</Split>
+
+<style>
+  .project {
+    padding-top: var(--space-5);
+  }
+
+  .back {
+    color: var(--muted);
+  }
+
+  @media (hover: hover) {
+    .back:hover {
+      color: var(--ink);
+    }
+  }
+
+  .project-header {
+    display: grid;
+    gap: var(--space-4);
+    margin-top: var(--space-6);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3) var(--space-6);
+    margin-top: var(--space-2);
+  }
+
+  .meta dt {
+    color: var(--muted);
+    font-size: var(--fs-mono-sm);
+  }
+
+  .meta dd {
+    margin: 0;
+    color: var(--ink);
+  }
+
+  .meta-tags dd {
+    padding-top: 0.15em;
+  }
+
+  .links {
+    max-width: var(--measure);
+    margin-top: var(--space-7);
+  }
+
+  .links h2 {
+    margin-bottom: var(--space-4);
+  }
+
+  .links ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .links li {
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .next {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-3);
+    max-width: var(--measure);
+    margin-top: var(--space-8);
+  }
+
+  .next a {
+    font-weight: 500;
+  }
+</style>

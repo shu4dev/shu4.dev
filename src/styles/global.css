@@ -1,0 +1,358 @@
+/* shu4.dev global styles: tokens, type scale, base elements, utilities.
+   Theme: <html data-theme="day|night"> is set before paint by the boot script in Base.astro.
+   Without JS (no data-theme) the night tokens follow prefers-color-scheme. */
+
+:root {
+  /* colour: day (frost) */
+  --ground: #eff2f3;
+  --surface: #e4e9eb;
+  --ink: #263238;
+  --muted: #607078;
+  --accent: #2e6f77;
+  --accent-ink: #ffffff;
+  --hairline: rgb(38 50 56 / 0.12);
+  --focus: var(--accent);
+  --panel-bg: var(--surface);
+  --media-opacity: 1;
+  /* hero window (Hero.astro): edge to edge by day. At night it sits inset in #panel (a size container, so cqmin
+     is the panel's shorter side) behind a hairline, and the star rain frames it. --media-ground is the window's
+     own ground; diagram boxes fill with it so rain never crosses a label. */
+  --media-inset: 0px;
+  --media-radius: 0px;
+  --media-edge: transparent;
+  --media-ground: var(--surface);
+  /* paper plate behind white-background figures (.prose figure.paper), the same in both themes */
+  --paper: #ffffff;
+
+  /* type */
+  --font-sans: 'Inter Variable', Inter, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --fs-body: 1rem;
+  --fs-small: 0.875rem;
+  --fs-mono: 0.8125rem;
+  --fs-mono-sm: 0.75rem;
+  --fs-h1: clamp(1.875rem, 1.35rem + 1.6vw, 2.4rem);
+  --fs-h2: 1.375rem;
+  --fs-h3: 1.0625rem;
+  --lh-body: 1.6;
+  --lh-tight: 1.15;
+  --tracking-mono: 0.04em;
+  --tracking-head: -0.02em;
+  --measure: 68ch;
+
+  /* space */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4.5rem;
+  --space-9: 6rem;
+  --gutter: clamp(1rem, 0.4rem + 2.6vw, 3.5rem);
+
+  /* layout: split stage at >= 960px, panel 45% / column 55% */
+  --panel-fr: 45fr;
+  --column-fr: 55fr;
+  --panel-phone-height: 40svh;
+
+  /* motion */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --dur-fast: 150ms;
+  --dur-base: 300ms;
+
+  color-scheme: light;
+}
+
+:root[data-theme='night'] {
+  --ground: #0b1016;
+  --surface: #121922;
+  --ink: #d9e1e6;
+  --muted: #8a98a3;
+  --accent: #6fc2cc;
+  --accent-ink: #0b1016;
+  --hairline: rgb(217 225 230 / 0.12);
+  --panel-bg: transparent;
+  --media-opacity: 0.92;
+  --media-inset: clamp(16px, 6cqmin, 48px);
+  --media-radius: 4px;
+  --media-edge: rgb(217 225 230 / 0.18);
+  --media-ground: var(--ground);
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --ground: #0b1016;
+    --surface: #121922;
+    --ink: #d9e1e6;
+    --muted: #8a98a3;
+    --accent: #6fc2cc;
+    --accent-ink: #0b1016;
+    --hairline: rgb(217 225 230 / 0.12);
+    --panel-bg: transparent;
+    --media-opacity: 0.92;
+    --media-inset: clamp(16px, 6cqmin, 48px);
+    --media-radius: 4px;
+    --media-edge: rgb(217 225 230 / 0.18);
+    --media-ground: var(--ground);
+    color-scheme: dark;
+  }
+}
+
+/* ---------- base ---------- */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  background: var(--ground);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+img,
+video,
+svg,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-weight: 600;
+  line-height: var(--lh-tight);
+  letter-spacing: var(--tracking-head);
+  text-wrap: balance;
+}
+
+h1 {
+  font-size: var(--fs-h1);
+  letter-spacing: -0.025em;
+}
+
+h2 {
+  font-size: var(--fs-h2);
+}
+
+h3 {
+  font-size: var(--fs-h3);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+p,
+ul,
+ol,
+dl,
+dd,
+figure,
+blockquote {
+  margin: 0;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+a {
+  color: var(--accent);
+  text-decoration-line: none;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.22em;
+}
+
+@media (hover: hover) {
+  a:hover {
+    text-decoration-line: underline;
+  }
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+/* ---------- utilities ---------- */
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* JetBrains Mono for dates, metrics, captions, nav labels */
+.mono {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  letter-spacing: var(--tracking-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+/* tags: mono, 12px, the only uppercase text on the site */
+.tag {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono-sm);
+  letter-spacing: var(--tracking-mono);
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.muted {
+  color: var(--muted);
+}
+
+.lead {
+  font-size: 1.125rem;
+  line-height: 1.55;
+  max-width: var(--measure);
+}
+
+/* ---------- prose (rendered markdown) ---------- */
+
+.prose {
+  max-width: var(--measure);
+}
+
+.prose > * + * {
+  margin-top: 1em;
+}
+
+.prose h2 {
+  margin-top: var(--space-7);
+  font-size: var(--fs-h2);
+}
+
+.prose h3 {
+  margin-top: var(--space-6);
+}
+
+.prose h2 + *,
+.prose h3 + * {
+  margin-top: var(--space-3);
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.25em;
+}
+
+.prose li + li {
+  margin-top: 0.35em;
+}
+
+.prose li::marker {
+  color: var(--muted);
+}
+
+/* in-prose links keep a faint underline so they are not told apart by colour alone */
+.prose a {
+  text-decoration-line: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 40%, transparent);
+}
+
+@media (hover: hover) {
+  .prose a:hover {
+    text-decoration-color: currentColor;
+  }
+}
+
+.prose img,
+.prose video {
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+}
+
+/* white-background figures (plots, renders on white) sit on a paper plate in both themes, so they read as
+   printed figures instead of a bright hole in the night page; the caption stays outside on the page ground */
+.prose figure.paper img {
+  padding: 8px;
+  background: var(--paper);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+}
+
+.prose figure figcaption {
+  margin-top: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono-sm);
+  letter-spacing: var(--tracking-mono);
+  color: var(--muted);
+}
+
+.prose code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+}
+
+.prose pre {
+  overflow-x: auto;
+  padding: var(--space-4);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  background: var(--surface);
+  font-size: var(--fs-mono);
+  line-height: 1.5;
+}
+
+.prose blockquote {
+  padding-left: var(--space-4);
+  border-left: 2px solid var(--hairline);
+  color: var(--muted);
+}
+
+.prose hr {
+  border: 0;
+  border-top: 1px solid var(--hairline);
+  margin-block: var(--space-6);
+}

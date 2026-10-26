@@ -1,0 +1,62 @@
+[
+  {
+    "title": "Hyundai Card",
+    "meta": "Data Science Intern · Seoul · 2025",
+    "line": "RAG pipeline for text-to-SQL with self-consistency decoding; migrated to an open-source model while keeping 80% execution accuracy."
+  },
+  {
+    "title": "Software verification, UH Mānoa",
+    "meta": "Software Verification Developer · 2024–2025",
+    "line": "Isabelle/HOL proofs of functional correctness, following the seL4 and RT-11 verification efforts."
+  },
+  {
+    "title": "Biological reaction simulation, UH Mānoa",
+    "meta": "Research Assistant · 2023",
+    "line": "Efficient simulation of a biological reaction model, with 2D and 3D visualization of the results."
+  },
+  {
+    "title": "Jane Street Real-Time Market Data Forecasting",
+    "meta": "Kaggle",
+    "line": "Supervised autoencoder + MLP; ranked 440 of 3,000 (top 15%)."
+  },
+  {
+    "title": "Spinner Dolphin Photo Grading Protocol",
+    "meta": "Computer vision",
+    "line": "Multi-stage model that detects, rates and classifies spinner dolphins by fin distinctiveness."
+  },
+  {
+    "title": "BirdCLEF 2024",
+    "meta": "Audio classification",
+    "line": "Transfer-learned MobileNet-v2 on spectrograms to identify under-studied Indian bird species."
+  },
+  {
+    "title": "Higgs Boson Detection",
+    "meta": "Classification",
+    "line": "Compared scikit-learn classifiers; 11th of 52 on the public leaderboard."
+  },
+  {
+    "title": "OpenAI CarRacing",
+    "meta": "TensorFlow",
+    "line": "2D CNN driving agent in TensorFlow for randomly generated tracks."
+  },
+  {
+    "title": "Full Cycle TakeOut",
+    "meta": "HACC 2023 finalist",
+    "line": "MERN and Meteor web app for ZeroWaste Oʻahu."
+  },
+  {
+    "title": "Protein folding",
+    "meta": "Algorithms",
+    "line": "Hydrophobic-polar lattice model solved by recursive backtracking."
+  },
+  {
+    "title": "PANDA programming club",
+    "meta": "Lecturer & Curriculum Developer · 2022–2025",
+    "line": "Designed an algorithms curriculum and led small-group sessions; 2023 Best Officer award."
+  },
+  {
+    "title": "ACM at Mānoa",
+    "meta": "Server Administrator & Webmaster · 2023–2024",
+    "line": "Maintained the chapter website and built internal tools for the leadership team."
+  }
+]

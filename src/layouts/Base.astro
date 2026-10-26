@@ -1,0 +1,306 @@
+---
+/**
+ * Document shell: head (meta, OG, canonical, fonts, theme boot), skip link, ClientRouter,
+ * the fixed rain canvas, and the column with header, <main id="main"> and footer.
+ * Pass a `panel` slot (Split.astro does) to get the two-column split stage; without it the page is one column.
+ */
+import '@fontsource-variable/inter';
+import '@fontsource-variable/jetbrains-mono';
+import '../styles/global.css';
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import { ClientRouter } from 'astro:transitions';
+import ThemeToggle from '../components/ThemeToggle.astro';
+import Rain from '../components/Rain.astro';
+import Contact from '../components/Contact.astro';
+
+export interface Props {
+  /** Page title; rendered as "<title> · Brian Shu". Omit on the home page. */
+  title?: string;
+  description?: string;
+  /** Open Graph image path under public/. */
+  image?: string;
+  type?: 'website' | 'article';
+  noindex?: boolean;
+}
+
+const SITE_NAME = 'Brian Shu';
+const {
+  title,
+  description = 'Brian Shu works on robot learning for long-horizon manipulation: M.S. Computer Science at Purdue (CoRAL Lab). Projects, the Fiatlux paper, code, datasets and CV.',
+  image = '/media/og-card.jpg',
+  type = 'website',
+  noindex = false,
+} = Astro.props;
+
+const fullTitle = title ? `${title} · ${SITE_NAME}` : `${SITE_NAME} · Robot learning for long-horizon manipulation`;
+const site = Astro.site ?? new URL('https://shu4.dev');
+const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL(image, site).href;
+const path = Astro.url.pathname;
+const hasPanel = Astro.slots.has('panel');
+const year = new Date().getFullYear();
+
+const nav = [
+  { href: '/#projects', label: 'Projects', current: path.startsWith('/projects/') },
+  { href: '/about/', label: 'About', current: path.startsWith('/about') },
+  { href: '/cv.pdf', label: 'CV', current: false, reload: true },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#EFF2F3" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0B1016" media="(prefers-color-scheme: dark)" />
+    <script is:inline>
+      // Theme boot: runs before first paint. Sets <html data-theme="day|night"> and exposes window.__theme.
+      (function () {
+        var d = document.documentElement;
+        var colors = { day: '#EFF2F3', night: '#0B1016' };
+        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        function system() {
+          return mq.matches ? 'night' : 'day';
+        }
+        function stored() {
+          try {
+            var v = localStorage.getItem('theme');
+            return v === 'day' || v === 'night' ? v : null;
+          } catch (e) {
+            return null;
+          }
+        }
+        function paint(doc, t) {
+          doc.documentElement.setAttribute('data-theme', t);
+          var metas = doc.querySelectorAll('meta[name="theme-color"]');
+          for (var i = 0; i < metas.length; i++) metas[i].setAttribute('content', colors[t]);
+        }
+        function emit(t) {
+          document.dispatchEvent(new CustomEvent('themechange', { detail: { theme: t } }));
+        }
+        paint(document, stored() || system());
+        if (window.__theme) return;
+        window.__theme = {
+          get: function () {
+            return d.getAttribute('data-theme') === 'night' ? 'night' : 'day';
+          },
+          set: function (t) {
+            paint(document, t);
+            try {
+              if (t === system()) localStorage.removeItem('theme');
+              else localStorage.setItem('theme', t);
+            } catch (e) {}
+            emit(t);
+          },
+        };
+        mq.addEventListener('change', function () {
+          if (stored()) return;
+          var t = system();
+          paint(document, t);
+          emit(t);
+        });
+        window.addEventListener('storage', function (e) {
+          if (e.key !== 'theme') return;
+          var t = stored() || system();
+          paint(document, t);
+          emit(t);
+        });
+        // ClientRouter replaces <html> attributes on navigation: carry the theme into the incoming page.
+        document.addEventListener('astro:before-swap', function (e) {
+          paint(e.newDocument, window.__theme.get());
+        });
+      })();
+    </script>
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content={type} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <canvas id="rain" aria-hidden="true" transition:persist="rain-canvas"></canvas>
+    <Rain />
+
+    <div class="page" data-layout={hasPanel ? 'split' : 'plain'}>
+      <slot name="panel" />
+
+      <div class="column">
+        <header class="site-header">
+          <a class="site-name" href="/">Brian Shu</a>
+          <nav class="site-nav" aria-label="Primary">
+            <ul role="list">
+              {
+                nav.map((item) => (
+                  <li>
+                    <a
+                      class="mono"
+                      href={item.href}
+                      aria-current={item.current ? 'page' : undefined}
+                      data-astro-reload={item.reload ? true : undefined}
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))
+              }
+            </ul>
+          </nav>
+          <div class="site-tools">
+            <Contact variant="icons" />
+            <ThemeToggle />
+          </div>
+        </header>
+
+        <main id="main" tabindex="-1">
+          <slot />
+        </main>
+
+        <footer class="site-footer">
+          <Contact variant="icons" />
+          <p class="mono muted">© {year} Brian Shu</p>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: var(--space-3);
+    left: var(--space-3);
+    z-index: 10;
+    padding: var(--space-2) var(--space-4);
+    border-radius: 4px;
+    background: var(--accent);
+    color: var(--accent-ink);
+    font-weight: 500;
+    translate: 0 -200%;
+  }
+
+  .skip-link:focus-visible {
+    translate: 0 0;
+  }
+
+  .page {
+    position: relative;
+    z-index: 1;
+    min-height: 100svh;
+  }
+
+  @media (min-width: 960px) {
+    .page[data-layout='split'] {
+      display: grid;
+      grid-template-columns: var(--panel-fr) var(--column-fr);
+      align-items: start;
+    }
+  }
+
+  .column {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 100svh;
+    padding-inline: var(--gutter);
+  }
+
+  .page[data-layout='plain'] .column {
+    max-width: 64rem;
+    margin-inline: auto;
+  }
+
+  main {
+    flex: 1;
+    padding-block: var(--space-6) var(--space-9);
+  }
+
+  main:focus {
+    outline: none;
+  }
+
+  .site-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: var(--space-5);
+    row-gap: var(--space-2);
+    padding-block: var(--space-5);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .site-name {
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+  }
+
+  .site-nav {
+    order: 3;
+    flex-basis: 100%;
+  }
+
+  .site-nav ul {
+    display: flex;
+    gap: var(--space-5);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-nav a {
+    display: inline-block;
+    padding-block: var(--space-1);
+    color: var(--muted);
+  }
+
+  .site-nav a[aria-current='page'] {
+    color: var(--accent);
+  }
+
+  @media (hover: hover) {
+    .site-nav a:hover {
+      color: var(--ink);
+    }
+  }
+
+  .site-tools {
+    display: flex;
+    align-items: center;
+    gap: var(--space-1);
+    margin-left: auto;
+  }
+
+  @media (min-width: 40rem) {
+    .site-nav {
+      order: 0;
+      flex-basis: auto;
+    }
+  }
+
+  .site-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding-block: var(--space-5) var(--space-6);
+    border-top: 1px solid var(--hairline);
+  }
+</style>

@@ -1,0 +1,135 @@
+---
+import { getCollection } from 'astro:content';
+import Split from '../layouts/Split.astro';
+import Hero from '../components/Hero.astro';
+import ProjectList from '../components/ProjectList.astro';
+import Contact from '../components/Contact.astro';
+import moreWork from '../data/more-work.json';
+
+const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
+const featured = projects.find((p) => p.id === 'fiatlux') ?? projects[0];
+---
+
+<Split>
+  <Hero slot="panel" hero={featured.data.hero} />
+
+  <section class="intro" aria-labelledby="intro-title">
+    <p class="eyebrow mono">M.S. Computer Science, Purdue · CoRAL Lab</p>
+    <h1 id="intro-title">Robot learning for long-horizon manipulation.</h1>
+    <p class="lead">
+      I'm Brian Shu. I build the pieces robot learning runs on: simulated tasks and benchmarks, expert demonstrations,
+      and the imitation-learning policies trained on them. I work with Prof. Ahmed H. Qureshi in the Cognitive Robot
+      Autonomy &amp; Learning Lab at Purdue.
+    </p>
+    <p class="availability mono">Looking for a Summer 2027 research internship · available May 10 – Aug 20, 2027</p>
+  </section>
+
+  <section id="projects" class="block" aria-labelledby="projects-title">
+    <h2 id="projects-title">Projects</h2>
+    <ProjectList projects={projects} />
+  </section>
+
+  <section class="block" aria-labelledby="more-title">
+    <h2 id="more-title">More work</h2>
+    <ul class="more-list" role="list">
+      {
+        moreWork.map((item) => (
+          <li>
+            <div class="more-head">
+              <span class="more-title">{item.title}</span>
+              <span class="more-meta mono">{item.meta}</span>
+            </div>
+            <p class="more-line">{item.line}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="block" aria-labelledby="about-title">
+    <h2 id="about-title">About</h2>
+    <p class="about-blurb">
+      Before Purdue I studied computer science and finance at the University of Hawaiʻi at Mānoa (B.S. and B.B.A.,
+      2026), where I helped build the Fiatlux benchmark with Prof. Igor Molybog. Earlier I interned in data science at
+      Hyundai Card in Seoul and wrote Isabelle/HOL proofs as a software verification developer.
+    </p>
+    <p><a class="more-link" href="/about/">More about me</a></p>
+  </section>
+
+  <section class="block" aria-labelledby="contact-title">
+    <h2 id="contact-title">Contact</h2>
+    <Contact variant="full" />
+  </section>
+</Split>
+
+<style>
+  .intro {
+    display: grid;
+    gap: var(--space-4);
+    padding-top: var(--space-6);
+  }
+
+  .eyebrow,
+  .availability {
+    color: var(--muted);
+  }
+
+  .intro h1 {
+    max-width: 20ch;
+  }
+
+  .block {
+    margin-top: var(--space-8);
+    scroll-margin-top: var(--space-5);
+  }
+
+  .block > h2 {
+    margin-bottom: var(--space-5);
+  }
+
+  .more-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .more-list li {
+    display: grid;
+    gap: var(--space-1);
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--hairline);
+  }
+
+  .more-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    column-gap: var(--space-4);
+  }
+
+  .more-title {
+    font-weight: 500;
+  }
+
+  .more-meta {
+    color: var(--muted);
+    font-size: var(--fs-mono-sm);
+  }
+
+  .more-line {
+    max-width: var(--measure);
+    color: var(--muted);
+    font-size: var(--fs-small);
+  }
+
+  .about-blurb {
+    max-width: var(--measure);
+  }
+
+  .more-link {
+    display: inline-block;
+    margin-top: var(--space-3);
+  }
+</style>

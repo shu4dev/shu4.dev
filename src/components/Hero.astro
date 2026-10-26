@@ -1,0 +1,195 @@
+---
+/**
+ * Hero media for the pinned panel, by kind:
+ *   video: <video autoplay muted loop playsinline preload="metadata" poster>, decorative (aria-hidden)
+ *   image: <img alt>
+ *   svg:   the file under public/ inlined at build time (so it can use currentColor and CSS custom properties)
+ * While a video or image loads, the robot loop shows; data-state flips "loading" -> "ready" when it can play.
+ * Under prefers-reduced-motion the video is paused on its poster.
+ * The .hero box is the media window: edge to edge by day; at night it sits inset by --media-inset (6% of the
+ * panel's shorter side, 16-48px) with a hairline edge and a 4px radius, so the star rain frames it. Video and
+ * image cover the window; an svg diagram is contained in it, on --media-ground.
+ */
+import fs from 'node:fs';
+import path from 'node:path';
+import RobotLoop from './RobotLoop.astro';
+
+interface Props {
+  hero: {
+    kind: 'video' | 'image' | 'svg';
+    src: string;
+    poster?: string;
+    alt: string;
+  };
+}
+
+const { hero } = Astro.props;
+
+let svg = '';
+if (hero.kind === 'svg') {
+  const file = path.join(process.cwd(), 'public', hero.src.replace(/^\/+/, ''));
+  svg = fs
+    .readFileSync(file, 'utf8')
+    .replace(/<\?xml[^>]*\?>/g, '')
+    .replace(/<!DOCTYPE[^>]*>/gi, '')
+    .trim();
+}
+---
+
+<div class="hero" data-hero data-kind={hero.kind} data-state={hero.kind === 'svg' ? 'ready' : 'loading'}>
+  {
+    hero.kind !== 'svg' && (
+      <div class="hero-placeholder" aria-hidden="true">
+        <RobotLoop class="hero-robot" />
+      </div>
+    )
+  }
+  {
+    hero.kind === 'video' && (
+      <video
+        class="hero-media"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="metadata"
+        poster={hero.poster}
+        aria-hidden="true"
+        tabindex="-1"
+        disablepictureinpicture
+        disableremoteplayback
+      >
+        <source src={hero.src} type="video/mp4" />
+      </video>
+    )
+  }
+  {hero.kind === 'image' && <img class="hero-media" src={hero.src} alt={hero.alt} decoding="async" fetchpriority="high" />}
+  {hero.kind === 'svg' && <div class="hero-svg" role="img" aria-label={hero.alt} set:html={svg} />}
+</div>
+
+<script>
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+  function ready(hero: HTMLElement) {
+    hero.dataset.state = 'ready';
+  }
+
+  function init() {
+    document.querySelectorAll<HTMLElement>('[data-hero]').forEach((hero) => {
+      if (hero.dataset.bound) return;
+      hero.dataset.bound = 'true';
+
+      const video = hero.querySelector('video');
+      const img = hero.querySelector('img');
+
+      if (video) {
+        if (reduceMotion.matches) {
+          video.removeAttribute('autoplay');
+          video.pause();
+          ready(hero);
+          return;
+        }
+        if (video.readyState >= 3) ready(hero);
+        else {
+          video.addEventListener('canplay', () => ready(hero), { once: true });
+          video.addEventListener('error', () => ready(hero), { once: true });
+        }
+        video.play().catch(() => ready(hero));
+      } else if (img) {
+        if (img.complete) ready(hero);
+        else {
+          img.addEventListener('load', () => ready(hero), { once: true });
+          img.addEventListener('error', () => ready(hero), { once: true });
+        }
+      } else {
+        ready(hero);
+      }
+    });
+  }
+
+  reduceMotion.addEventListener('change', () => {
+    document.querySelectorAll<HTMLVideoElement>('[data-hero] video').forEach((video) => {
+      if (reduceMotion.matches) video.pause();
+      else video.play().catch(() => {});
+    });
+  });
+
+  // init now (first load) and after every ClientRouter navigation; init is idempotent
+  init();
+  document.addEventListener('astro:page-load', init);
+</script>
+
+<style>
+  .hero {
+    position: absolute;
+    inset: var(--media-inset);
+    overflow: hidden;
+    border-radius: var(--media-radius);
+    background: var(--media-ground);
+  }
+
+  /* the window's hairline edge (night only; transparent by day), drawn above the media */
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border: 1px solid var(--media-edge);
+    border-radius: inherit;
+    pointer-events: none;
+  }
+
+  .hero-media {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 500ms var(--ease-out);
+  }
+
+  /* only hide media while loading when JS is running (the boot script always sets data-theme) */
+  :global(:root[data-theme]) .hero[data-state='loading'] .hero-media {
+    opacity: 0;
+  }
+
+  .hero-placeholder {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    transition:
+      opacity var(--dur-base) ease,
+      visibility var(--dur-base);
+  }
+
+  .hero-placeholder :global(.hero-robot) {
+    width: min(40%, 12rem);
+  }
+
+  .hero[data-state='ready'] .hero-placeholder,
+  :global(:root:not([data-theme])) .hero-placeholder {
+    opacity: 0;
+    visibility: hidden;
+  }
+
+  .hero-svg {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: clamp(0.75rem, 4%, 3rem);
+    color: var(--ink);
+    opacity: var(--media-opacity);
+  }
+
+  /* diagrams are drawn on a 400-unit-wide viewBox with 14.5-unit minimum text: >= 11px on a 390px phone,
+     about body size (16px labels) at the 26rem cap on desktop */
+  .hero-svg :global(svg) {
+    width: 100%;
+    max-width: 26rem;
+    height: 100%;
+    overflow: visible;
+  }
+</style>
