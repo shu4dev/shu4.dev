@@ -19,19 +19,5 @@
     "place": "Seoul, South Korea",
     "dates": "Jun 2025 – Jul 2025",
     "line": "Built a retrieval-augmented generation (RAG) pipeline from scratch for text-to-SQL tasks with self-consistency decoding; cut inference costs by moving from a closed- to an open-source model while preserving 80% accuracy."
-  },
-  {
-    "org": "University of Hawaiʻi at Mānoa",
-    "role": "Software Verification Developer",
-    "place": "Honolulu, HI",
-    "dates": "May 2024 – May 2025",
-    "line": "Applied formal methods to verify functional correctness in a project inspired by seL4 and RT-11, with a proof strategy in interactive theorem proving (Isabelle/HOL)."
-  },
-  {
-    "org": "University of Hawaiʻi at Mānoa",
-    "role": "Research Assistant",
-    "place": "Honolulu, HI",
-    "dates": "Jun 2023 – Aug 2023",
-    "line": "Devised an efficient algorithm to simulate a mathematical model of biological reactions, and created 2D and 3D models to visualize its results."
   }
 ]

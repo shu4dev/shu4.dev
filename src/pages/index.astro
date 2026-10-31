@@ -5,7 +5,6 @@ import ProjectList from '../components/ProjectList.astro';
 import Contact from '../components/Contact.astro';
 import publications from '../data/publications.json';
 import experience from '../data/experience.json';
-import moreWork from '../data/more-work.json';
 import { Content as About, frontmatter as about } from '../content/about.md';
 
 const projects = (await getCollection('projects')).sort((a, b) => a.data.order - b.data.order);
@@ -26,7 +25,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 
   <section id="projects" class="block" aria-labelledby="projects-title">
     <h2 id="projects-title">Projects</h2>
-    <p class="block-intro">Four projects, each with its own page: what I built, media from the simulator, and the code.</p>
+    <p class="block-intro">Three projects, each with its own page: what I built, media from the simulator, and the code.</p>
     <ProjectList projects={projects} />
   </section>
 
@@ -81,21 +80,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
               </span>
             </div>
             <p class="row-line">{e.line}</p>
-          </li>
-        ))
-      }
-    </ul>
-
-    <h3 class="more-title">More work</h3>
-    <ul class="rows" role="list">
-      {
-        moreWork.map((item) => (
-          <li>
-            <div class="row-head">
-              <span class="row-title">{item.title}</span>
-              <span class="row-meta mono">{item.meta}</span>
-            </div>
-            <p class="row-line">{item.line}</p>
           </li>
         ))
       }
@@ -204,7 +188,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     color: var(--muted);
   }
 
-  /* experience and more work: hairline-separated text rows */
+  /* experience: hairline-separated text rows */
   .rows {
     margin: 0;
     padding: 0;
@@ -247,11 +231,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     font-size: var(--fs-small);
   }
 
-  .more-title {
-    margin: var(--space-7) 0 var(--space-3);
-    font-size: var(--fs-h3);
-    font-weight: 600;
-  }
 
   #contact .block-intro {
     margin-bottom: var(--space-3);
