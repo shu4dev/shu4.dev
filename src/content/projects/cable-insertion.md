@@ -26,7 +26,7 @@ I took the imitation-learning route: upgrade a privileged expert that solves the
 - **The expert policy.** I upgraded a privileged expert for UR5e cable insertion with force-monitored descent and jam recovery. The diagram on this page shows its insert-and-recover loop.
 - **Demonstration collection.** I built a ROS 2/Gazebo demo-collection pipeline that runs on a Slurm cluster.
 - **Data conversion.** I wrote a parallel converter from MCAP recordings to the LeRobot dataset format. A sample of the converted demonstrations is public on Hugging Face.
-- **Learned policies.** I trained ACT and Diffusion Policy policies from the expert demonstrations with a DAgger-style approach.
+- **Learned policies.** I trained ACT and Diffusion Policy policies from the expert demonstrations with DART-style noise injection.
 
 ## Result
 
