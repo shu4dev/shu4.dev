@@ -15,7 +15,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     <img class="portrait" src="/media/portrait.jpg" alt="Brian Shu" width="200" height="200" decoding="async" />
     <div class="intro-text">
       <h1 id="intro-title">Brian Shu</h1>
-      <p class="eyebrow mono">M.S. Computer Science, Purdue · CoRAL Lab</p>
       <div class="prose bio">
         <About />
       </div>
@@ -118,11 +117,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     display: grid;
     justify-self: stretch;
     gap: var(--space-4);
-  }
-
-  .eyebrow {
-    margin-top: calc(var(--space-2) * -1);
-    color: var(--muted);
   }
 
   .bio > * + * {
