@@ -41,9 +41,9 @@ const year = new Date().getFullYear();
 // "/" is the home page; section anchors point at it from every page
 const isHome = path === '/' || path === '/index.html';
 const nav = [
-  { href: '/#projects', label: 'Projects' },
-  { href: '/#publications', label: 'Publications' },
   { href: '/#experience', label: 'Experience' },
+  { href: '/#publications', label: 'Publications' },
+  { href: '/#projects', label: 'Projects' },
   { href: '/#contact', label: 'Contact' },
   { href: '/cv.pdf', label: 'CV', reload: true },
 ];
@@ -54,16 +54,15 @@ const nav = [
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#EFF2F3" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0B1016" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#EFF2F3" />
     <script is:inline>
       // Theme boot: runs before first paint. Sets <html data-theme="day|night"> and exposes window.__theme.
       (function () {
         var d = document.documentElement;
         var colors = { day: '#EFF2F3', night: '#0B1016' };
-        var mq = window.matchMedia('(prefers-color-scheme: dark)');
+        // Default is day regardless of the OS setting; the toggle stores night in localStorage.
         function system() {
-          return mq.matches ? 'night' : 'day';
+          return 'day';
         }
         function stored() {
           try {
@@ -96,12 +95,6 @@ const nav = [
             emit(t);
           },
         };
-        mq.addEventListener('change', function () {
-          if (stored()) return;
-          var t = system();
-          paint(document, t);
-          emit(t);
-        });
         window.addEventListener('storage', function (e) {
           if (e.key !== 'theme') return;
           var t = stored() || system();

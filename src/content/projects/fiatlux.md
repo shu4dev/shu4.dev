@@ -17,8 +17,6 @@ links:
     href: https://fiatlux-bench.github.io
   - label: Benchmark code (haw-ai-i/fiatlux)
     href: https://github.com/haw-ai-i/fiatlux
-  - label: Environment code (shu4dev/fiatlux-env)
-    href: https://github.com/shu4dev/fiatlux-env
 ---
 
 ## What it is

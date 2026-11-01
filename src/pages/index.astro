@@ -22,9 +22,25 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     </div>
   </section>
 
-  <section id="projects" class="block" aria-labelledby="projects-title">
-    <h2 id="projects-title">Projects</h2>
-    <ProjectList projects={projects} />
+  <section id="experience" class="block" aria-labelledby="experience-title">
+    <h2 id="experience-title">Experience</h2>
+    <ul class="rows" role="list">
+      {
+        experience.map((e) => (
+          <li>
+            <div class="row-head">
+              <span>
+                <strong>{e.org}</strong> — {e.role}
+              </span>
+              <span class="row-meta mono">
+                {e.place} · {e.dates}
+              </span>
+            </div>
+            <p class="row-line">{e.line}</p>
+          </li>
+        ))
+      }
+    </ul>
   </section>
 
   <section id="publications" class="block" aria-labelledby="publications-title">
@@ -63,25 +79,9 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     </ol>
   </section>
 
-  <section id="experience" class="block" aria-labelledby="experience-title">
-    <h2 id="experience-title">Experience</h2>
-    <ul class="rows" role="list">
-      {
-        experience.map((e) => (
-          <li>
-            <div class="row-head">
-              <span>
-                <strong>{e.org}</strong> — {e.role}
-              </span>
-              <span class="row-meta mono">
-                {e.place} · {e.dates}
-              </span>
-            </div>
-            <p class="row-line">{e.line}</p>
-          </li>
-        ))
-      }
-    </ul>
+  <section id="projects" class="block" aria-labelledby="projects-title">
+    <h2 id="projects-title">Projects</h2>
+    <ProjectList projects={projects} />
   </section>
 
   <section id="contact" class="block" aria-labelledby="contact-title">

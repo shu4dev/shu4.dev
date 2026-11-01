@@ -1,6 +1,6 @@
 /* shu4.dev global styles: tokens, type scale, base elements, utilities.
    Theme: <html data-theme="day|night"> is set before paint by the boot script in Base.astro.
-   Without JS (no data-theme) the night tokens follow prefers-color-scheme. */
+   Day is the default; night only when the toggle stored it. Without JS the page is day. */
 
 :root {
   /* colour: day (frost) */
@@ -67,19 +67,6 @@
   color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) {
-    --ground: #0b1016;
-    --surface: #121922;
-    --ink: #d9e1e6;
-    --muted: #8a98a3;
-    --accent: #6fc2cc;
-    --accent-ink: #0b1016;
-    --hairline: rgb(217 225 230 / 0.12);
-    --muted-surface: var(--muted);
-    color-scheme: dark;
-  }
-}
 
 /* ---------- base ---------- */
 
