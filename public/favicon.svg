@@ -8,5 +8,8 @@
     }
   </style>
   <rect width="32" height="32" rx="7"/>
-  <path d="M11 6v20M21 6v20M11 10.5h10M11 16h10M11 21.5h10" fill="none" stroke-width="2" stroke-linecap="round"/>
+  <!-- katana, grip bottom-left to tip top-right: grip, cross guard, slightly curved blade -->
+  <path d="M5.8 26.2l5-5" fill="none" stroke-width="3.2" stroke-linecap="round"/>
+  <path d="M9.3 18.3l5.4 5.4" fill="none" stroke-width="2.4" stroke-linecap="round"/>
+  <path d="M12.4 19.6Q18.6 12 27 5.4" fill="none" stroke-width="2.5" stroke-linecap="round"/>
 </svg>
