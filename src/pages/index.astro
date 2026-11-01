@@ -24,7 +24,6 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
 
   <section id="projects" class="block" aria-labelledby="projects-title">
     <h2 id="projects-title">Projects</h2>
-    <p class="block-intro">Three projects, each with its own page: what I built, media from the simulator, and the code.</p>
     <ProjectList projects={projects} />
   </section>
 
@@ -160,6 +159,7 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     color: var(--muted);
   }
 
+  #projects > h2,
   #publications > h2 {
     margin-bottom: var(--space-5);
   }
