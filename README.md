@@ -12,4 +12,4 @@ npm run preview   # serve dist/
 - Projects: `src/content/projects/*.md` (schema in `src/content.config.ts`), media in `public/media/<slug>/`.
 - Layouts: `src/layouts/Base.astro` (document, header, footer, theme boot) and `src/layouts/Split.astro` (pinned panel + column).
 - Theme tokens: `src/styles/global.css` on `:root` and `:root[data-theme="night"]`.
-- CV: `public/cv.pdf` is a copy of `summer-2027-internships/resumes/Brian_Shu_CV_full.pdf`.
+- CV: `public/cv.pdf` is a copy of `career/2026-27/internships/resumes/Brian_Shu_CV_web.pdf`.
