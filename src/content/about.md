@@ -7,4 +7,4 @@ I'm Brian Shu, an M.S. student in Computer Science at Purdue University, working
 
 Right now I am developing a general-purpose robot manipulation policy for [dishwasher tasks](/projects/dishwasher/). At HawAII, I co-developed [Fiatlux](/projects/fiatlux/), an Isaac Lab benchmark in which a Unitree G1 humanoid climbs a ladder to replace a bulb, now under review at IEEE ICRA 2027.
 
-I'm looking for a robotics research internship for Summer 2027. If your lab or team works on robot learning, manipulation or simulation benchmarks, I would like to hear from you.
+I'm looking for a robotics research internship for Summer 2027. If your lab or team works on physics-informed learning, world models, generalist robot models, robot learning or imitation learning, I would like to hear from you.
