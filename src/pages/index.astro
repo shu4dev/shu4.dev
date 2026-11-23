@@ -87,10 +87,8 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
   <section id="contact" class="block" aria-labelledby="contact-title">
     <h2 id="contact-title">Contact</h2>
     <p class="block-intro">
-      Email is the quickest way to reach me: <a href="mailto:brianshu0915@gmail.com">brianshu0915@gmail.com</a>. I'm also on GitHub,
-      Hugging Face and LinkedIn.
+      Email is the quickest way to reach me: <a href="mailto:brianshu0915@gmail.com">brianshu0915@gmail.com</a>. I'm also on <a href="https://github.com/shu4dev" rel="me">GitHub</a>, <a href="https://huggingface.co/shu4dev" rel="me">Hugging Face</a> and <a href="https://www.linkedin.com/in/brian-shu-1bb75b251" rel="me">LinkedIn</a>.
     </p>
-    <Contact variant="icons" />
   </section>
 </Base>
 
@@ -225,8 +223,4 @@ const projects = (await getCollection('projects')).sort((a, b) => a.data.order -
     font-size: var(--fs-small);
   }
 
-
-  #contact .block-intro {
-    margin-bottom: var(--space-3);
-  }
 </style>
