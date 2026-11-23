@@ -1,7 +1,7 @@
 ---
 /**
  * Project cards on the home page, in collection order: thumbnail (Hero thumb) left, text right
- * (year · tags, title linking to /projects/<id>/, summary, links). Card layout lives in global.css (.card).
+ * (title linking to /projects/<id>/, summary, links). Card layout lives in global.css (.card).
  */
 import type { CollectionEntry } from 'astro:content';
 import Hero from './Hero.astro';
@@ -33,7 +33,6 @@ function rowLinks(links: { label: string; href: string }[]) {
           <Hero hero={p.data.hero} thumb />
         </div>
         <div class="card-body">
-          <p class="card-meta mono">{[p.data.year, ...p.data.tags].join(' · ')}</p>
           <h3 class="card-title">
             <a href={`/projects/${p.id}/`}>{p.data.title}</a>
           </h3>
